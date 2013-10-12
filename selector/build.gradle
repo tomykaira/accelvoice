@@ -1,0 +1,6 @@
+apply plugin: "groovy"
+
+dependencies {
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile "org.codehaus.groovy:groovy-all:$ext.groovyVersion"
+}
