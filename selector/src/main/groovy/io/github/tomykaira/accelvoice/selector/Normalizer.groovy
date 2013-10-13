@@ -12,16 +12,19 @@ class Normalizer {
     }
 
     List<String> normalize(String token) {
-        def words = splitCamel(token)
-                .collectMany { upperCaseWords(it) }
-        if (words.every { dictionary.hasWord(it) })
+        def words
+        try {
+            words = splitCamel(token)
+                    .collectMany { upperCaseWords(it) }
+                    .collectMany { splitWordByWord(it) }
+        } catch (NormalizationFailedException ignored) {
+            // rethrow with the original token
+            throw new NormalizationFailedException(token)
+        }
+        if (words.every { it != null && dictionary.hasWord(it) })
             words
         else {
-            words = splitWordByWord(token.toUpperCase())
-            if (words == null)
-                throw new NormalizationFailedException(token)
-            println(token + " -> " + words.join(" "))
-            words.collectMany { upperCaseWords(it) }
+            null
         }
     }
 
@@ -35,19 +38,14 @@ class Normalizer {
             return []
         if (dictionary.hasWord(token))
             return [token];
-        int i = 0;
-        int length = token.length()
-        while (i < length && !dictionary.hasWord(token[0..i]))
-            i ++
-        if (i == length)
-            return null
+        int i = token.length() - 1
+        while (i >= 0 && !dictionary.hasWord(token[0..i]))
+            i --
+        if (i < 0)
+            throw new NormalizationFailedException(token)
         def rest = splitWordByWord(token[(i+1)..-1])
-        if (rest != null) {
-            rest.add(0, token[0..i])
-            rest
-        } else {
-            null
-        }
+        rest.add(0, token[0..i])
+        rest
     }
 
     static List<String> splitCamel(String token) {
