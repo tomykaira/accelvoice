@@ -24,8 +24,7 @@ class TokenCollection {
         while ((code = tokenizer.nextToken()) != StreamTokenizer.TT_EOF) {
             if (code == StreamTokenizer.TT_WORD) {
                 tokenizer.sval.split("\\.").each {
-                    occurrence[it] =
-                        (occurrence[it]?:0) + 1
+                    occurrence.put(it, (occurrence.get(it)?:0) + 1)
                 }
             }
         }
