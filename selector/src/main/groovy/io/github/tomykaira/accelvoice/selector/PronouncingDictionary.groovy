@@ -5,25 +5,29 @@ package io.github.tomykaira.accelvoice.selector
  */
 
 class PronouncingDictionary {
-    final Map<String, String> data
+    final Map<String, String> pronunciation
+    final Map<String, Double> ratio
 
-    def PronouncingDictionary(Map<String, String> data) {
-        this.data = data
+    def PronouncingDictionary(Map<String, String> pronunciation, Map<String, Double> ratio) {
+        this.pronunciation = pronunciation
+        this.ratio = ratio
     }
 
     boolean hasWord(String word) {
         if (word.matches(".*\\(\\d+\\)"))
             return false
-        return data.containsKey(word)
+        return pronunciation.containsKey(word)
     }
 
     private static PronouncingDictionary fromLines(List<String> lines) {
-        def map = new HashMap<String, String>()
+        def pron = new HashMap<String, String>()
+        def ratio = new HashMap<String, Double>()
         lines.each { line ->
-            def (word, pronunciation) = line.split("\\s+", 2)
-            map.put(word, pronunciation)
+            def (word, weight, pronunciation) = line.split("\\s+", 3)
+            pron.put(word, pronunciation)
+            ratio.put(word, weight as double)
         }
-        new PronouncingDictionary(map)
+        new PronouncingDictionary(pron, ratio)
     }
 
     static PronouncingDictionary fromString(String content) {
@@ -31,7 +35,7 @@ class PronouncingDictionary {
     }
 
     static PronouncingDictionary fromResource() {
-        this.class.getResource("/cmudict_keywords.dic").withReader { reader ->
+        this.class.getResource("/java_cmudict.dic").withReader { reader ->
             fromLines(reader.readLines())
         }
     }

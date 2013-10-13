@@ -3,8 +3,8 @@ package io.github.tomykaira.accelvoice.selector
 import spock.lang.Specification
 
 class NormalizerSpec extends Specification {
-    def data = "BACK                 B AE K\n" +
-            "LOG                  L AO G"
+    def data = "BACK\t0.005\tB AE K\n" +
+            "LOG\t0.005\tL AO G"
     def dictionary = PronouncingDictionary.fromString(data)
     def fullDictionary = PronouncingDictionary.fromResource()
 

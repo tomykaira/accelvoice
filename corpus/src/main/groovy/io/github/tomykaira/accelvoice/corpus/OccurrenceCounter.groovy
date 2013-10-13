@@ -24,7 +24,7 @@ class OccurrenceCounter implements NormalizationListener {
     void dumpAsDictionary(PronouncingDictionary dictionary, File output) {
         double sum = (sureWords + unsureWords).values().inject(0) { s, b -> s + b }
         output.withWriter { writer ->
-            dictionary.data.sort().each { k, v ->
+            dictionary.pronunciation.sort().each { k, v ->
                 writer.printf("%s\t%.6f\t%s\n", k, roundedRatio(k, sum), v)
             }
         }
