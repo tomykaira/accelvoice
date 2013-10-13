@@ -31,7 +31,7 @@ class PronouncingDictionary {
     }
 
     static PronouncingDictionary fromResource() {
-        this.class.getResource("cmudict_keywords.dic").withReader { reader ->
+        this.class.getResource("/cmudict_keywords.dic").withReader { reader ->
             fromLines(reader.readLines())
         }
     }

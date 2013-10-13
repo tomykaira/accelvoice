@@ -22,4 +22,12 @@ class PronouncingDictionarySpec extends Specification {
         "HELLRAISER" | true
         "HAPPY"      | false
     }
+
+    def "from resource"() {
+        when:
+        def dict = PronouncingDictionary.fromResource()
+
+        then:
+        dict.hasWord("HELLO") == true
+    }
 }
