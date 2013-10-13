@@ -16,7 +16,7 @@ class Normalizer {
     List<String> normalize(String token) {
         def words
         try {
-            words = splitCamel(token)
+            words = splitCamel(replaceNumbers(token))
                     .collectMany { upperCaseWords(it) }
                     .collectMany {
                 def result = splitWordByWord(it)
@@ -59,6 +59,25 @@ class Normalizer {
         def rest = splitWordByWord(token[(i+1)..-1])
         rest.add(0, token[0..i])
         rest
+    }
+
+    static private def numberTable = [
+            '0': 'ZERO',
+            '1': 'ONE',
+            '2': 'TWO',
+            '3': 'THREE',
+            '4': 'FOUR',
+            '5': 'FIVE',
+            '6': 'SIX',
+            '7': 'SEVEN',
+            '8': 'EIGHT',
+            '9': 'NINE'
+    ]
+
+    static String replaceNumbers(String token) {
+        token.replaceAll("[0-9]") {
+            '_' + numberTable[it] + '_'
+        }
     }
 
     static List<String> splitCamel(String token) {

@@ -108,5 +108,7 @@ class NormalizerSpec extends Specification {
         "JSONException"         | ["J", "SON", "EXCEPTION"]   // questionable
         "initActions"           | ["INIT", "ACTIONS"]
         "Subfolders"            | ["SUB", "FOLDERS"]
+        "time1"                 | ["TIME", "ONE"]
+        "as400"                 | ["AS", "FOUR", "ZERO", "ZERO"] // TODO
     }
 }
