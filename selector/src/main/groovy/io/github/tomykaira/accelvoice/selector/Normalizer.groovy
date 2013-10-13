@@ -6,9 +6,11 @@ package io.github.tomykaira.accelvoice.selector
 
 class Normalizer {
     private final PronouncingDictionary dictionary
+    private final NormalizationListener listener
 
-    def Normalizer(PronouncingDictionary dictionary) {
+    def Normalizer(PronouncingDictionary dictionary, NormalizationListener listener = null) {
         this.dictionary = dictionary
+        this.listener = listener
     }
 
     List<String> normalize(String token) {
@@ -16,15 +18,26 @@ class Normalizer {
         try {
             words = splitCamel(token)
                     .collectMany { upperCaseWords(it) }
-                    .collectMany { splitWordByWord(it) }
+                    .collectMany {
+                def result = splitWordByWord(it)
+                if (listener != null) {
+                    if (result != [it])
+                        listener.onUnsureWords(it, result)
+                    else
+                        listener.onSureWord(token, it)
+                }
+                result
+            }
         } catch (NormalizationFailedException ignored) {
             // rethrow with the original token
             throw new NormalizationFailedException(token)
         }
-        if (words.every { it != null && dictionary.hasWord(it) })
+        if (words.every { dictionary.hasWord(it) }) {
+            if (listener != null)
+                listener.tokenNormalized(token, words)
             words
-        else {
-            null
+        } else {
+            throw new NormalizationFailedException(token)
         }
     }
 

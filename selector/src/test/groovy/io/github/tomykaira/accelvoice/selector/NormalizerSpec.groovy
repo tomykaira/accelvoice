@@ -59,6 +59,38 @@ class NormalizerSpec extends Specification {
         thrown(NormalizationFailedException)
     }
 
+    def "it should notify incidents to the Listener"() {
+        when:
+        final def results = new ArrayList<List<String>>()
+        final def unsure = new ArrayList<String>()
+        final def sure = new ArrayList<String>()
+        def listener = new NormalizationListener() {
+            @Override
+            void tokenNormalized(String token, List<String> result) {
+                results.add(result)
+            }
+
+            @Override
+            void onSureWord(String token, String word) {
+                sure.add(word)
+            }
+
+            @Override
+            void onUnsureWords(String token, List<String> estimate) {
+                unsure.add(token)
+            }
+        }
+        def normalizer = new Normalizer(dictionary, listener)
+        normalizer.normalize("BACK")
+        normalizer.normalize("BACK_LOG")
+        normalizer.normalize("BACKLOG")
+
+        then:
+        results == [["BACK"], ["BACK", "LOG"], ["BACK", "LOG"]]
+        unsure == ["BACKLOG"]
+        sure == ["BACK", "BACK", "LOG"]
+    }
+
     def "it should process unknown words with the full dictionary"() {
         when:
         def normalizer = new Normalizer(fullDictionary)
