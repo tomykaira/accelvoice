@@ -23,8 +23,8 @@ class TokenCollection {
         int code
         while ((code = tokenizer.nextToken()) != StreamTokenizer.TT_EOF) {
             if (code == StreamTokenizer.TT_WORD) {
-                tokenizer.sval.split("\\.").each {
-                    occurrence.put(it.replaceAll('--', ''), (occurrence.get(it)?:0) + 1)
+                tokenizer.sval.split("\\.|-").findAll { !it.isEmpty() }.each {
+                    occurrence.put(it, (occurrence.get(it)?:0) + 1)
                 }
             }
         }
