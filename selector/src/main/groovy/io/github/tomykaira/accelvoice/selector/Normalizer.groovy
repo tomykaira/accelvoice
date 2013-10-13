@@ -1,5 +1,7 @@
 package io.github.tomykaira.accelvoice.selector
 
+import groovy.transform.Immutable
+
 /**
  * Normalize a candidate token to a list of pronounceable words
  */
@@ -51,14 +53,37 @@ class Normalizer {
             return []
         if (dictionary.hasWord(token))
             return [token];
-        int i = token.length() - 1
-        while (i >= 0 && !dictionary.hasWord(token[0..i]))
-            i --
-        if (i < 0)
+        def length = token.length()
+        def table = new WordChain[length + 1];
+        table[0] = new WordChain([], 1)
+        for (int i = 1; i <= length; i ++) {
+            table[i] = new WordChain([], 0)
+            for (int j = 0; j < i; j ++) {
+                table[i] = max(table[i], table[j].add(token[j..(i-1)]))
+            }
+        }
+        def result = table.last()
+        if (result.freq == 0)
             throw new NormalizationFailedException(token)
-        def rest = splitWordByWord(token[(i+1)..-1])
-        rest.add(0, token[0..i])
-        rest
+        else
+            table[length].words
+    }
+
+    private static def max(WordChain l, WordChain r) {
+        if (l.freq > r.freq)
+            l
+        else
+            r
+    }
+
+    @Immutable
+    private class WordChain {
+        List<String> words
+        double freq
+
+        def add(String word) {
+            new WordChain(words.plus(word), freq * dictionary.ratioOf(word))
+        }
     }
 
     static private def numberTable = [

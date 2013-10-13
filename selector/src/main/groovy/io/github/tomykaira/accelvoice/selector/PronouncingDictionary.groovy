@@ -19,6 +19,10 @@ class PronouncingDictionary {
         return pronunciation.containsKey(word)
     }
 
+    double ratioOf(String word) {
+        ratio.get(word)?:0
+    }
+
     private static PronouncingDictionary fromLines(List<String> lines) {
         def pron = new HashMap<String, String>()
         def ratio = new HashMap<String, Double>()
