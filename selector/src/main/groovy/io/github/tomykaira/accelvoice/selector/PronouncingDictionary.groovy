@@ -17,12 +17,22 @@ class PronouncingDictionary {
         return data.containsKey(word)
     }
 
-    static def fromString(String content) {
+    private static PronouncingDictionary fromLines(List<String> lines) {
         def map = new HashMap<String, String>()
-        content.split("\n").each { line ->
+        lines.each { line ->
             def (word, pronunciation) = line.split("\\s+", 2)
             map.put(word, pronunciation)
         }
         new PronouncingDictionary(map)
+    }
+
+    static PronouncingDictionary fromString(String content) {
+        fromLines(content.split("\n") as List<String>)
+    }
+
+    static PronouncingDictionary fromResource() {
+        this.class.getResource("cmudict_keywords.dic").withReader { reader ->
+            fromLines(reader.readLines())
+        }
     }
 }
