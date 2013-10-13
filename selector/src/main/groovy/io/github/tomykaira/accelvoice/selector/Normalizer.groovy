@@ -20,6 +20,7 @@ class Normalizer {
             words = splitWordByWord(token.toUpperCase())
             if (words == null)
                 throw new NormalizationFailedException(token)
+            println(token + " -> " + words.join(" "))
             words.collectMany { upperCaseWords(it) }
         }
     }
