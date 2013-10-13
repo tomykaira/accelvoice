@@ -24,7 +24,7 @@ class TokenCollection {
         while ((code = tokenizer.nextToken()) != StreamTokenizer.TT_EOF) {
             if (code == StreamTokenizer.TT_WORD) {
                 tokenizer.sval.split("\\.").each {
-                    occurrence.put(it, (occurrence.get(it)?:0) + 1)
+                    occurrence.put(it.replaceAll('--', ''), (occurrence.get(it)?:0) + 1)
                 }
             }
         }
@@ -36,8 +36,21 @@ class TokenCollection {
 
     private static StreamTokenizer createTokenizer(Reader reader) {
         def tokenizer = new StreamTokenizer(reader)
+        tokenizer.resetSyntax()
         tokenizer.slashSlashComments(true)
         tokenizer.slashStarComments(true)
+        tokenizer.wordChars(c('0'), c('9'))
+        tokenizer.wordChars(c('A'), c('Z'))
+        tokenizer.wordChars(c('a'), c('z'))
+        tokenizer.wordChars(c('_'), c('_'))
+        tokenizer.whitespaceChars(c(' '), c(' '))
+        tokenizer.whitespaceChars(c('\n'), c('\n'))
+        tokenizer.whitespaceChars(c('\t'), c('\t'))
+        tokenizer.whitespaceChars(c('\r'), c('\r'))
+        tokenizer.quoteChar(c('\''))
+        tokenizer.quoteChar(c('\"'))
+        tokenizer.parseNumbers()
+        tokenizer.eolIsSignificant(true)
         tokenizer
     }
 }
