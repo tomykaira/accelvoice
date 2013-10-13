@@ -29,6 +29,16 @@ class JavaProject {
         failed
     }
 
+    List<String> countWordOccurrences() {
+        traverse()
+        def counter = new OccurrenceCounter()
+        def normalizer = new Normalizer(PronouncingDictionary.fromResource(), counter)
+        tokens.occurrence.keySet().each { token ->
+            normalizer.normalize(token)
+        }
+        counter.dump(new File(projectRoot.toString() + "/occurrences.csv"))
+    }
+
     void traverse() {
         if (traversed)
             return

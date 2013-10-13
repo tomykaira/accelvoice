@@ -5,7 +5,7 @@ package io.github.tomykaira.accelvoice.selector
  */
 
 class PronouncingDictionary {
-    private final Map<String, String> data
+    final Map<String, String> data
 
     def PronouncingDictionary(Map<String, String> data) {
         this.data = data
