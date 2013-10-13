@@ -35,7 +35,9 @@ class TokenCollection {
     }
 
     private static StreamTokenizer createTokenizer(Reader reader) {
-        new StreamTokenizer(reader)
-        // configure if needed
+        def tokenizer = new StreamTokenizer(reader)
+        tokenizer.slashSlashComments(true)
+        tokenizer.slashStarComments(true)
+        tokenizer
     }
 }
