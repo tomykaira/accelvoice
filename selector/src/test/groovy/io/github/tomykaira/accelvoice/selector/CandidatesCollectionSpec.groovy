@@ -33,8 +33,6 @@ class CandidatesCollectionSpec extends Specification {
 
     def "candidates collection should return the selected candidate"() {
         when:
-        println(System.getProperty("java.class.path").split(":").find { it.contains("libaccel_recognizer.so") })
-
         def collection = new CandidatesCollection(candidates)
         collection.setRecognizerLibrary(mockLibrary)
         mockLibrary.response = 1
@@ -45,8 +43,6 @@ class CandidatesCollectionSpec extends Specification {
 
     def "candidates collection should raise exception if nothing selected"() {
         when:
-        println(System.getProperty("java.class.path").split(":").find { it.contains("libaccel_recognizer.so") })
-
         def collection = new CandidatesCollection(candidates)
         collection.setRecognizerLibrary(mockLibrary)
         mockLibrary.response = -1
