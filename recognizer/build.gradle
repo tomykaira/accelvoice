@@ -2,6 +2,10 @@ task(build, type: Exec) {
     commandLine 'make', 'all'
 }
 
+task(run, type: Exec, dependsOn: build) {
+    commandLine 'build/bin/accel_recognizer'
+}
+
 task(clean, type: Exec) {
     commandLine 'make', 'clean'
 }
