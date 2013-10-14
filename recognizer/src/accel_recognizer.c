@@ -4,7 +4,6 @@
 
 #include "../include/accel_recognizer.h"
 #include "fsg.h"
-#include "string_utility.h"
 #include "t2p.h"
 
 #define HANDLE_G_ERROR(description) do { \
@@ -103,7 +102,7 @@ void stop()
 }
 
 
-static int count_candidates(char *candidates[])
+static int count_candidates(char **candidates[])
 {
   int length = 0;
   while (candidates[length] != NULL)
@@ -125,27 +124,36 @@ static char *join(char **words)
   return result;
 }
 
-char *recognize(char *candidates[])
+int recognize(char **candidates[], char *unknown[])
 {
   fsg_model_t *fsg;
   fsg_set_t* fsgs;
   int candidate_length = count_candidates(candidates);
-  hash_table_t *conversion_map = hash_table_new(candidate_length * 2, HASH_CASE_YES);
-  char ***keys = ckd_calloc(candidate_length + 1, sizeof(char**));
-  char *response = NULL;
+  hash_table_t *index_map;
+  int result_index;
 
-  for (int i = 0; i < candidate_length; ++i) {
-    char **altered = list_words(candidates[i], UPCASE);
-    hash_table_enter(conversion_map, join(altered), (void *)candidates[i]);
-    keys[i] = altered;
+  for (int i = 0; unknown[i] != NULL; ++i) {
+    char * phones = synthesize_phones(unknown[i]);
+    fprintf(stderr, "%s -> \"%s\"\n", unknown[i], phones);
+    if (ps_add_word(ps, unknown[i], phones, TRUE) < 0) {
+      fprintf(stderr, "Failed to add word %s\n", unknown[i]);
+      free(phones);
+      return -1;
+    }
+    free(phones);
   }
 
-  fsg = build_dynamic_fsg(ps, LW, keys, candidate_length);
+  fsg = build_dynamic_fsg(ps, LW, candidates, candidate_length);
   fsgs = ps_get_fsgset(ps);
   if (add_fsg_model(ps, fsg) != 0)
-    return NULL;
+    return -1;
   fsg_set_select(fsgs, fsg_model_name(fsg));
   ps_update_fsgset(ps);
+
+  index_map = hash_table_new(candidate_length * 2, HASH_CASE_YES);
+  for (int i = 0; i < candidate_length; ++i) {
+    hash_table_enter_int32(index_map, join(candidates[i]), i);
+  }
 
  retry:
   waiting_result = 1;
@@ -155,10 +163,10 @@ char *recognize(char *candidates[])
     usleep(1000);
   }
 
-  if (hash_table_lookup(conversion_map, result, (void **)&response) == - 1)
+  if (hash_table_lookup_int32(index_map, result, &result_index) == - 1)
     goto retry;
 
-  hash_table_free(conversion_map);
+  hash_table_free(index_map);
 
-  return response;
+  return result_index;
 }

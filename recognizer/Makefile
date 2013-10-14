@@ -8,9 +8,9 @@ MODELDIR=`pkg-config --variable=modeldir pocketsphinx`
 DICT_SOURCE=../selector/src/main/resources/java_cmudict.dic
 CFLAGS=-g -std=gnu99 -Wall
 
-SRC=accel_recognizer fsg string_utility t2p
+SRC=accel_recognizer fsg t2p
 SRC_FILES=$(SRC:%=src/%.c)
-LOCAL_HEADERS=fsg string_utility t2p
+LOCAL_HEADERS=fsg t2p
 LOCAL_HEADER_FILES=$(LOCAL_HEADERS:%=src/%.h)
 PUBLIC_HEADERS=accel_recognizer
 PUBLIC_HEADER_FILES=$(PUBLIC_HEADERS:%=include/%.h)
@@ -25,7 +25,7 @@ $(LIB): $(SRC_FILES) $(LOCAL_HEADER_FILES) $(PUBLIC_HEADER_FILES)
 
 $(BIN): src/accel_recognizer_main.c $(LIB)
 	mkdir -p `dirname $(BIN)`
-	gcc $(CFLAGS) -o $@ $^
+	gcc $(CFLAGS) -o $@ $^ `pkg-config --cflags --libs pocketsphinx sphinxbase gstreamer-0.10`
 
 $(DICT): $(DICT_SOURCE)
 	mkdir -p `dirname $(DICT)`
