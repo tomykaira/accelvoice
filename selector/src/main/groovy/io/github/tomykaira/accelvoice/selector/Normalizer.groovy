@@ -19,6 +19,7 @@ class Normalizer {
         def unknowns = []
         def words = splitCamel(replaceNumbers(token))
                 .collectMany { upperCaseWords(it) }
+                .collectMany { splitWordByWord(it) }
                 .each {
             def isKnown = dictionary.hasWord(it)
             if (listener != null) {
@@ -56,7 +57,7 @@ class Normalizer {
         }
         def result = table.last()
         if (result.freq == 0)
-            throw new NormalizationFailedException(token)
+            [token]
         else
             table[length].words
     }
@@ -74,7 +75,9 @@ class Normalizer {
         double freq
 
         def add(String word) {
-            new WordChain(words.plus(word), freq * dictionary.ratioOf(word))
+            def ratio = dictionary.ratioOf(word)
+            def suppressed = ratio < 0.0000011 ? 0 : ratio
+            new WordChain(words.plus(word), freq * suppressed)
         }
     }
 

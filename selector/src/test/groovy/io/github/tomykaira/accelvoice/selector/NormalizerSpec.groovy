@@ -48,7 +48,7 @@ class NormalizerSpec extends Specification {
         "back_log"   | ["BACK", "LOG"]
         "BACK_LOG"   | ["BACK", "LOG"]
         "backLog"    | ["BACK", "LOG"]
-        "backlog"    | ["BACKLOG"]
+        "backlog"    | ["BACK", "LOG"]
     }
 
     def "it should raise NormalizationFailed exception"() {
@@ -84,31 +84,30 @@ class NormalizerSpec extends Specification {
         }
         def normalizer = new Normalizer(dictionary, listener)
         normalizer.normalize("BACK")
-        normalizer.normalize("BACK_LOG")
+        normalizer.normalize("BACK_LEG")
         normalizer.normalize("BACKLOG")
 
         then:
-        results == [["BACK"], ["BACK", "LOG"], ["BACKLOG"]]
-        unsure == ["BACKLOG"]
-        sure == ["BACK", "BACK", "LOG"]
+        results == [["BACK"], ["BACK", "LEG"], ["BACK", "LOG"]]
+        unsure == ["LEG"]
+        sure == ["BACK", "BACK", "BACK", "LOG"]
     }
 
-    @Ignore
     def "it should process unknown words with the full dictionary"() {
         when:
         def normalizer = new Normalizer(fullDictionary)
 
         then:
-        normalizer.normalize(token) == list
+        normalizer.normalize(token).words == list
 
         where:
         token                   | list
         "resourcenameOther"     | ["RESOURCE", "NAME", "OTHER"]
-        "addRfsRule"            | ["ADD", "R", "FS", "RULE"]  // TODO: Split f and s
+        "addRfsRule"            | ["ADD", "RFS", "RULE"]  // TODO: Split f and s
         "FILEPATH"              | ["FILE", "PATH"]
         "INSERTROW"             | ["INSERT", "ROW"]
         "setScaleRendermode"    | ["SET", "SCALE", "RENDER", "MODE"]
-        "JSONException"         | ["J", "SON", "EXCEPTION"]   // questionable
+        "JSONException"         | ["JSON", "EXCEPTION"]   // questionable
         "initActions"           | ["INIT", "ACTIONS"]
         "Subfolders"            | ["SUB", "FOLDERS"]
         "time1"                 | ["TIME", "ONE"]
