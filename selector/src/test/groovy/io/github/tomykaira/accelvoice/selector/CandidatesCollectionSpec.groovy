@@ -50,7 +50,7 @@ class CandidatesCollectionSpec extends Specification {
         def collection = new CandidatesCollection(candidates)
         collection.setRecognizerLibrary(mockLibrary)
         mockLibrary.response = -1
-        collection.select()
+        collection.select() == "b"
 
         then:
         thrown(RecognitionException)

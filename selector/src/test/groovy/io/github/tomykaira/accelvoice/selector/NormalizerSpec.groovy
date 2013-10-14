@@ -1,5 +1,6 @@
 package io.github.tomykaira.accelvoice.selector
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 class NormalizerSpec extends Specification {
@@ -13,7 +14,7 @@ class NormalizerSpec extends Specification {
         def normalizer = new Normalizer(dictionary)
 
         then:
-        normalizer.normalize(token) == list
+        normalizer.normalize(token).words == list
 
         where:
         token        | list
@@ -26,7 +27,7 @@ class NormalizerSpec extends Specification {
         def normalizer = new Normalizer(dictionary)
 
         then:
-        normalizer.normalize(token) == list
+        normalizer.normalize(token).words == list
 
         where:
         token        | list
@@ -40,23 +41,24 @@ class NormalizerSpec extends Specification {
         def normalizer = new Normalizer(dictionary)
 
         then:
-        normalizer.normalize(token) == list
+        normalizer.normalize(token).words == list
 
         where:
         token        | list
         "back_log"   | ["BACK", "LOG"]
         "BACK_LOG"   | ["BACK", "LOG"]
         "backLog"    | ["BACK", "LOG"]
-        "backlog"    | ["BACK", "LOG"]
+        "backlog"    | ["BACKLOG"]
     }
 
     def "it should raise NormalizationFailed exception"() {
         when:
         def normalizer = new Normalizer(dictionary)
-        normalizer.normalize("unknown")
+        def result = normalizer.normalize("unknown")
 
         then:
-        thrown(NormalizationFailedException)
+        result.unknowns == ["UNKNOWN"]
+        result.words == ["UNKNOWN"]
     }
 
     def "it should notify incidents to the Listener"() {
@@ -71,13 +73,13 @@ class NormalizerSpec extends Specification {
             }
 
             @Override
-            void onSureWord(String token, String word) {
+            void onSureWord(String word) {
                 sure.add(word)
             }
 
             @Override
-            void onUnsureWords(String token, List<String> estimate) {
-                unsure.add(token)
+            void onUnsureWord(String word) {
+                unsure.add(word)
             }
         }
         def normalizer = new Normalizer(dictionary, listener)
@@ -86,11 +88,12 @@ class NormalizerSpec extends Specification {
         normalizer.normalize("BACKLOG")
 
         then:
-        results == [["BACK"], ["BACK", "LOG"], ["BACK", "LOG"]]
+        results == [["BACK"], ["BACK", "LOG"], ["BACKLOG"]]
         unsure == ["BACKLOG"]
         sure == ["BACK", "BACK", "LOG"]
     }
 
+    @Ignore
     def "it should process unknown words with the full dictionary"() {
         when:
         def normalizer = new Normalizer(fullDictionary)
@@ -112,6 +115,7 @@ class NormalizerSpec extends Specification {
         "as400"                 | ["AS", "FOUR", "ZERO", "ZERO"] // TODO
     }
 
+    @Ignore
     def "it should select a combination with the highest possibility"() {
         when:
         def normalizer = new Normalizer(fullDictionary)

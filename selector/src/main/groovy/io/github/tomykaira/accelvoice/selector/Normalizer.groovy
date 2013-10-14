@@ -15,32 +15,24 @@ class Normalizer {
         this.listener = listener
     }
 
-    List<String> normalize(String token) {
-        def words
-        try {
-            words = splitCamel(replaceNumbers(token))
-                    .collectMany { upperCaseWords(it) }
-                    .collectMany {
-                def result = splitWordByWord(it)
-                if (listener != null) {
-                    if (result != [it])
-                        listener.onUnsureWords(it, result)
-                    else
-                        listener.onSureWord(token, it)
-                }
-                result
+    NormalizationResult normalize(String token) {
+        def unknowns = []
+        def words = splitCamel(replaceNumbers(token))
+                .collectMany { upperCaseWords(it) }
+                .each {
+            def isKnown = dictionary.hasWord(it)
+            if (listener != null) {
+                if (!isKnown)
+                    listener.onUnsureWord(it)
+                else
+                    listener.onSureWord(it)
             }
-        } catch (NormalizationFailedException ignored) {
-            // rethrow with the original token
-            throw new NormalizationFailedException(token)
+            if (!isKnown)
+                unknowns.add(it)
         }
-        if (words.every { dictionary.hasWord(it) }) {
-            if (listener != null)
-                listener.tokenNormalized(token, words)
-            words
-        } else {
-            throw new NormalizationFailedException(token)
-        }
+        if (listener)
+            listener.tokenNormalized(token, words)
+        new NormalizationResult(words, unknowns)
     }
 
     /**
@@ -111,5 +103,11 @@ class Normalizer {
 
     static List<String> upperCaseWords(String token) {
         token.split("_").collect { it.toUpperCase() }.findAll { !it.isEmpty() }
+    }
+
+    @Immutable
+    private static class NormalizationResult {
+        List<String> words
+        List<String> unknowns
     }
 }

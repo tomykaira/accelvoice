@@ -7,7 +7,7 @@ package io.github.tomykaira.accelvoice.selector
 interface NormalizationListener {
     void tokenNormalized(String token, List<String> result)
 
-    void onSureWord(String token, String word)
+    void onSureWord(String word)
 
-    void onUnsureWords(String token, List<String> estimate)
+    void onUnsureWord(String word)
 }

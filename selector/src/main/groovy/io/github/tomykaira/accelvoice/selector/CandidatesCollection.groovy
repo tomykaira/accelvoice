@@ -21,13 +21,14 @@ class CandidatesCollection {
         if (selected != null)
             return selected
 
-
+        def unknowns = []
         mapping = candidates.collect {
             def result = normalizer.normalize(it)
-            new TokenConversionMap(it, result)
+            unknowns.addAll(result.unknowns)
+            new TokenConversionMap(it, result.words)
         }
         def result = recognizerLibrary
-                .recognize(mapping.collect { it.words.toArray() as String[] }.toArray() as String[][], [] as String[])
+                .recognize(mapping.collect { it.words.toArray() }.toArray() as String[][], [] as String[])
         if (result < 0 || result >= mapping.size())
             throw new RecognitionException()
         selected = mapping[result].original
