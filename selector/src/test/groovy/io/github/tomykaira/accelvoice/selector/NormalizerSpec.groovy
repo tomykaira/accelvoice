@@ -7,7 +7,7 @@ class NormalizerSpec extends Specification {
     def data = "BACK\t0.005\tB AE K\n" +
             "LOG\t0.005\tL AO G"
     def dictionary = PronouncingDictionary.fromString(data)
-    def fullDictionary = PronouncingDictionary.fromResource()
+    def fullDictionary = PronouncingDictionary.fromResource
 
     def "it should return the word if the dictionary contains"() {
         when:

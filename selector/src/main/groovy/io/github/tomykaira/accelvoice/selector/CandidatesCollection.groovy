@@ -7,7 +7,7 @@ class CandidatesCollection {
     private String selected;
     RecognizerLibrary recognizerLibrary = RecognizerLibrary.INSTANCE
     List<CandidatesCollection.TokenConversionMap> mapping
-    Normalizer normalizer = new Normalizer(PronouncingDictionary.fromResource())
+    Normalizer normalizer = new Normalizer(PronouncingDictionary.fromResource)
 
     def CandidatesCollection(List<String> candidates) {
         this.candidates = candidates

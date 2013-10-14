@@ -18,7 +18,7 @@ class JavaProject {
     List<String> reportAbnormalTokens() {
         traverse()
         def failed = []
-        def normalizer = new Normalizer(PronouncingDictionary.fromResource())
+        def normalizer = new Normalizer(PronouncingDictionary.fromResource)
         tokens.occurrence.keySet().each { token ->
             try {
                 normalizer.normalize(token)
@@ -32,7 +32,7 @@ class JavaProject {
     OccurrenceCounter countWordOccurrences() {
         traverse()
         def counter = new OccurrenceCounter()
-        def normalizer = new Normalizer(PronouncingDictionary.fromResource(), counter)
+        def normalizer = new Normalizer(PronouncingDictionary.fromResource, counter)
         tokens.occurrence.keySet().each { token ->
             normalizer.normalize(token)
         }

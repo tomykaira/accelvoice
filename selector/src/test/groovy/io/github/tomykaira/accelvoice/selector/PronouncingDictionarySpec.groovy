@@ -25,7 +25,7 @@ class PronouncingDictionarySpec extends Specification {
 
     def "from resource"() {
         when:
-        def dict = PronouncingDictionary.fromResource()
+        def dict = PronouncingDictionary.fromResource
 
         then:
         dict.hasWord("HELLO") == true

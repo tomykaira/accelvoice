@@ -38,9 +38,8 @@ class PronouncingDictionary {
         fromLines(content.split("\n") as List<String>)
     }
 
-    static PronouncingDictionary fromResource() {
+    @Lazy
+    private static PronouncingDictionary fromResource =
         this.class.getResource("/java_cmudict.dic").withReader { reader ->
             fromLines(reader.readLines())
-        }
-    }
-}
+        }}
