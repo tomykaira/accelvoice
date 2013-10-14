@@ -1,0 +1,7 @@
+task(build, type: Exec) {
+    commandLine 'make', 'all'
+}
+
+task(clean, type: Exec) {
+    commandLine 'make', 'clean'
+}
