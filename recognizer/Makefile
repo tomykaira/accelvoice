@@ -1,4 +1,4 @@
-LIB=build/lib/accel_recognizer.so
+LIB=build/lib/libaccel_recognizer.so
 BIN=build/bin/accel_recognizer
 DICT=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))/build/data/accel_voice.dic
 
