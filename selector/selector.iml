@@ -6,8 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/groovy" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/scala" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/groovy" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/groovy" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
@@ -15,6 +15,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="groovy-2.1.7" level="application" />
     <orderEntry type="library" name="jna-4.0.0" level="project" />
+    <orderEntry type="library" name="jna-3.2.7" level="project" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
@@ -29,7 +30,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jna-platform-4.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jna-platform-3.2.7.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -38,7 +39,16 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/jna-4.0.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jna-3.2.7.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="file://$USER_HOME$/ownCloud/graduation_thesis/voice/accelvoice/recognizer/build/lib/libaccel_recognizer.so" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
