@@ -103,7 +103,7 @@ class NormalizerSpec extends Specification {
         where:
         token                   | list
         "resourcenameOther"     | ["RESOURCE", "NAME", "OTHER"]
-        "addRfsRule"            | ["ADD", "RFS", "RULE"]  // TODO: Split f and s
+        "addRfsRule"            | ["ADD", "RFS", "RULE"]
         "FILEPATH"              | ["FILE", "PATH"]
         "INSERTROW"             | ["INSERT", "ROW"]
         "setScaleRendermode"    | ["SET", "SCALE", "RENDER", "MODE"]
@@ -114,18 +114,16 @@ class NormalizerSpec extends Specification {
         "as400"                 | ["AS", "FOUR", "ZERO", "ZERO"] // TODO
     }
 
-    @Ignore
     def "it should select a combination with the highest possibility"() {
         when:
         def normalizer = new Normalizer(fullDictionary)
 
         then:
-        normalizer.normalize(token) == list
+        normalizer.normalize(token).words == list
 
         where:
         token                   | list
         "ADDSOURCE"             | ["ADD", "SOURCE"]
         "ALLINFO"               | ["ALL", "INFO"]
-        "CDATA"                 | ["C", "DATA"]
     }
 }
