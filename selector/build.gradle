@@ -1,3 +1,4 @@
+apply plugin: 'application'
 apply plugin: "groovy"
 apply plugin: 'idea'
 
@@ -8,3 +9,5 @@ dependencies {
     compile fileTree('lib')
     compile files('../recognizer/build/lib/libaccel_recognizer.so')
 }
+
+mainClassName = 'io.github.tomykaira.accelvoice.selector.Demo'

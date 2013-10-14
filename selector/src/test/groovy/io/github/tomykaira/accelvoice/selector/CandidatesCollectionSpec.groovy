@@ -20,8 +20,8 @@ class CandidatesCollectionSpec extends Specification {
         }
 
         @Override
-        int recognize(String[][] candidates, String[] unknown) {
-            lastCandidates = candidates
+        int recognize(SplitWordList candidates, String[] unknown) {
+            lastCandidates = candidates.getData()
             lastUnknown = unknown
             return response
         }

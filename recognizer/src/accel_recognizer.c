@@ -128,9 +128,11 @@ int recognize(char **candidates[], char *unknown[])
 {
   fsg_model_t *fsg;
   fsg_set_t* fsgs;
-  int candidate_length = count_candidates(candidates);
+  int candidate_length;
   hash_table_t *index_map;
   int result_index;
+
+  candidate_length = count_candidates(candidates);
 
   for (int i = 0; unknown[i] != NULL; ++i) {
     char * phones = synthesize_phones(unknown[i]);
@@ -152,7 +154,7 @@ int recognize(char **candidates[], char *unknown[])
 
   index_map = hash_table_new(candidate_length * 2, HASH_CASE_YES);
   for (int i = 0; i < candidate_length; ++i) {
-    hash_table_enter_int32(index_map, join(candidates[i]), i);
+    (void)hash_table_enter_int32(index_map, join(candidates[i]), i);
   }
 
  retry:
