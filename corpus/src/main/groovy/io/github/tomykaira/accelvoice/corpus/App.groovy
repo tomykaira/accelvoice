@@ -10,6 +10,9 @@ class App {
         }
         def root = new File(args[0])
         def project = new JavaProject(root)
-        project.countWordOccurrences()
+        def counter = project.countWordOccurrences()
+        def dictionary = PronouncingDictionary.fromResource()
+        counter.dump(new File(root.toString() + "/occurrences.csv"))
+        counter.dumpAsDictionary(dictionary, new File("java_updated.dic"))
     }
 }

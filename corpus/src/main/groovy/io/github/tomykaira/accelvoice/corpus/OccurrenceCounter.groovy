@@ -25,7 +25,7 @@ class OccurrenceCounter implements NormalizationListener {
         double sum = (sureWords + unsureWords).values().inject(0) { s, b -> s + b }
         output.withWriter { writer ->
             dictionary.pronunciation.sort().each { k, v ->
-                writer.printf("%s\t%.6f\t%s\n", k, roundedRatio(k, sum), v)
+                writer.println(sprintf("%s\t%.6f\t%s", k, roundedRatio(k, sum), v))
             }
         }
     }
@@ -64,12 +64,12 @@ class OccurrenceCounter implements NormalizationListener {
     }
 
     @Override
-    void onSureWord(String token, String word) {
+    void onSureWord(String word) {
         sureWords.put(word, (sureWords.get(word)?:0) + 1)
     }
 
     @Override
-    void onUnsureWords(String token, List<String> estimate) {
+    void onUnsureWord(String token) {
         unsureWords.put(token, (unsureWords.get(token)?:0) + 1)
     }
 }
