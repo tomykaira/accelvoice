@@ -150,6 +150,13 @@
       </item>
     </group>
   </component>
+  <component name="ProjectDictionaryState">
+    <dictionary name="tomita">
+      <words>
+        <w>accel</w>
+      </words>
+    </dictionary>
+  </component>
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/corpus/corpus.iml" filepath="$PROJECT_DIR$/corpus/corpus.iml" />
@@ -168,14 +175,6 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/selector/lib/jna-3.2.7.jar!/" />
         <root url="jar://$PROJECT_DIR$/selector/lib/jna-platform-3.2.7.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
-    <library name="jna-4.0.0">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/selector/lib/jna-4.0.0.jar!/" />
-        <root url="jar://$PROJECT_DIR$/selector/lib/jna-platform-4.0.0.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
