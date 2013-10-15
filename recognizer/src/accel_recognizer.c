@@ -19,6 +19,20 @@ static int waiting_result = 0;
 static char result[1024];
 
 static gboolean
+vader_start(const GstElement* asr, GstClockTime ts)
+{
+  fprintf(stderr, "vader start %lld\n", ts);
+  return FALSE;
+}
+
+static gboolean
+vader_stop(const GstElement* asr, GstClockTime ts)
+{
+  fprintf(stderr, "vader stop %lld\n", ts);
+  return FALSE;
+}
+
+static gboolean
 asr_partial_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
   fprintf(stderr, "partial result hyp: %s uttid: %s\n", hyp, uttid);
@@ -34,17 +48,16 @@ asr_result(const GstElement* asr, char const *hyp, char const *uttid)
   return FALSE;
 }
 
+static GValue g_true = G_VALUE_INIT;
+
 static void set_asr_properties(GObject *asr)
 {
-  GValue g_true = G_VALUE_INIT;
   GValue g_hmm = G_VALUE_INIT, g_dict = G_VALUE_INIT, g_fsg = G_VALUE_INIT;
 
-  g_value_init(&g_true, G_TYPE_BOOLEAN);
   g_value_init(&g_hmm, G_TYPE_STRING);
   g_value_init(&g_fsg, G_TYPE_STRING);
   g_value_init(&g_dict, G_TYPE_STRING);
 
-  g_value_set_boolean(&g_true, TRUE);
   g_value_set_static_string(&g_hmm, MODELDIR "/hmm/en_US/hub4wsj_sc_8k");
   g_value_set_static_string(&g_fsg, MODELDIR "/lm/en/tidigits.fsg"); /* temp file to start */
   g_value_set_static_string(&g_dict, DICT);
@@ -54,7 +67,6 @@ static void set_asr_properties(GObject *asr)
   g_object_set_property(asr, "dict", &g_dict);
   g_object_set_property(asr, "configured", &g_true);
 
-  g_value_unset(&g_true);
   g_value_unset(&g_hmm);
   g_value_unset(&g_dict);
   g_value_unset(&g_fsg);
@@ -66,9 +78,13 @@ static GstElement *pipeline = NULL;
 void start(int argc_p, char *argv_p[])
 {
   GError *err = NULL;
+  GstElement* vader = NULL;
   GstElement* asr = NULL;
 
   g_type_init();
+
+  g_value_init(&g_true, G_TYPE_BOOLEAN);
+  g_value_set_boolean(&g_true, TRUE);
 
   /* Initialize GStreamer */
   gst_init(&argc_p, &argv_p);
@@ -76,6 +92,11 @@ void start(int argc_p, char *argv_p[])
   /* Build the pipeline */
   pipeline = gst_parse_launch ("gconfaudiosrc ! audioconvert ! audioresample ! vader name=vad auto-threshold=true ! pocketsphinx name=asr ! fakesink", &err);
   HANDLE_G_ERROR("gst_parse_launch");
+
+  /* set up vader */
+  vader = gst_bin_get_by_name((GstBin *)pipeline, "vad");
+  g_signal_connect(vader, "vader_start", G_CALLBACK(vader_start), NULL);
+  g_signal_connect(vader, "vader_stop", G_CALLBACK(vader_stop), NULL);
 
   /* set up asr */
   asr = gst_bin_get_by_name((GstBin *)pipeline, "asr");
@@ -88,6 +109,7 @@ void start(int argc_p, char *argv_p[])
   /* Start pipeline */
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
+  gst_object_unref(vader);
   gst_object_unref(asr);
 
   t2p_start();
@@ -95,6 +117,8 @@ void start(int argc_p, char *argv_p[])
 
 void stop()
 {
+  g_value_unset(&g_true);
+
   t2p_stop();
 
   /* Free resources */
@@ -125,6 +149,15 @@ static char *join(char **words)
   return result;
 }
 
+static void vader_force_silent()
+{
+  GstElement* vader = NULL;
+
+  vader = gst_bin_get_by_name((GstBin *)pipeline, "vad");
+
+  g_object_set_property((GObject *)vader, "silent", &g_true);
+}
+
 int recognize(char **candidates[], char *unknown[])
 {
   fsg_model_t *fsg;
@@ -132,6 +165,8 @@ int recognize(char **candidates[], char *unknown[])
   int candidate_length;
   hash_table_t *index_map;
   int result_index;
+
+  vader_force_silent();
 
   candidate_length = count_candidates(candidates);
 
