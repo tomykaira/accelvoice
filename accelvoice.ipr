@@ -154,7 +154,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/corpus/corpus.iml" filepath="$PROJECT_DIR$/corpus/corpus.iml" />
       <module fileurl="file://$PROJECT_DIR$/ideaplugin/ideaplugin.iml" filepath="$PROJECT_DIR$/ideaplugin/ideaplugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/recognizer/recognizer.iml" filepath="$PROJECT_DIR$/recognizer/recognizer.iml" />
       <module fileurl="file://$PROJECT_DIR$/selector/selector.iml" filepath="$PROJECT_DIR$/selector/selector.iml" />
     </modules>
   </component>
