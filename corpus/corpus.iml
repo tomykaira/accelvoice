@@ -8,17 +8,16 @@
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="groovy-2.1.7" level="application" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-26/filestore/org.codehaus.groovy/groovy-all/2.1.7/jar/c136ae67c3c40740ae986582baf65ba5c5ce69a0/groovy-all-2.1.7.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-26/filestore/org.codehaus.groovy/groovy-all/2.0.6/jar/ea722dd9fa8df99a7e88448d5b914215145e856d/groovy-all-2.0.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-26/filestore/org.codehaus.groovy/groovy-all/2.1.7/source/f138389c966d0c4f68e8809ee5ac565196fca08c/groovy-all-2.1.7-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.gradle/caches/artifacts-26/filestore/org.codehaus.groovy/groovy-all/2.0.6/source/5b065ea9beee4d4936c38875f59f91e6fbddadc5/groovy-all-2.0.6-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>

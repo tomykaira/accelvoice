@@ -1,5 +1,5 @@
 allprojects {
-    ext.groovyVersion = '2.1.7'
+    ext.groovyVersion = '2.0.6'
 }
 
 subprojects {
