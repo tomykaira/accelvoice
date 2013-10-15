@@ -1,5 +1,6 @@
 package io.github.tomykaira.accelvoice.selector;
 
+import com.sun.jna.Callback;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
@@ -8,7 +9,23 @@ public interface RecognizerLibrary extends com.sun.jna.Library {
 
     public void stop();
 
-    public int recognize(SplitWordList candidates, java.lang.String[] unknown);
+    interface cb_vader_start extends Callback {
+        void invoke(long timestamp);
+    }
+    interface cb_vader_stop extends Callback {
+        void invoke(long timestamp);
+    }
+    interface cb_recognized extends Callback {
+        void invoke(int index);
+    }
+
+    void register_cb_vader_start(cb_vader_start cb);
+    void register_cb_vader_stop(cb_vader_stop cb);
+    void register_cb_recognized(cb_recognized cb);
+
+    public int start_recognition(SplitWordList candidates, java.lang.String[] unknown);
+
+    public void abort_recognition();
 
     public static final RecognizerLibrary INSTANCE =
             RecognizerLibrary.Loader.loadLibrary();

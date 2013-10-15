@@ -8,18 +8,20 @@ class CandidatesCollection {
     RecognizerLibrary recognizerLibrary = RecognizerLibrary.INSTANCE
     List<CandidatesCollection.TokenConversionMap> mapping
     Normalizer normalizer = new Normalizer(PronouncingDictionary.fromResource)
+    final SelectionListener selectionListener
 
-    def CandidatesCollection(List<String> candidates) {
+    def CandidatesCollection(List<String> candidates, SelectionListener selectionListener) {
         this.candidates = candidates
+        this.selectionListener = selectionListener
     }
 
     void setRecognizerLibrary(RecognizerLibrary library) {
         this.recognizerLibrary = library
     }
 
-    String select() {
+    void select() {
         if (selected != null)
-            return selected
+            return
 
         def unknowns = new ArrayList<String>()
         mapping = candidates.collect {
@@ -27,11 +29,17 @@ class CandidatesCollection {
             unknowns.addAll(result.unknowns)
             new TokenConversionMap(it, result.words)
         }
+
+        recognizerLibrary.register_cb_recognized(CallbackWrapper.callbackRecognized { result ->
+            if (result >= 0 && result < mapping.size()) {
+                selected = mapping[result].original
+                selectionListener.notify(selected)
+            }
+        })
         def result = recognizerLibrary
-                .recognize(new SplitWordList(mapping.collect { it.words }), unknowns.toArray() as String[])
-        if (result < 0 || result >= mapping.size())
+                .start_recognition(new SplitWordList(mapping.collect { it.words }), unknowns.toArray() as String[])
+        if (result < 0)
             throw new RecognitionException()
-        selected = mapping[result].original
     }
 
     @Immutable
