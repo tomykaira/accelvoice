@@ -6,6 +6,7 @@
 #include "fsg.h"
 #include "t2p.h"
 #include "dict.h"
+#include "callbacks.h"
 
 #define HANDLE_G_ERROR(description) do { \
 if (err != NULL) { \
@@ -14,39 +15,6 @@ if (err != NULL) { \
   err = NULL; \
 } \
 } while(0);
-
-static int waiting_result = 0;
-static char result[1024];
-
-static gboolean
-vader_start(const GstElement* asr, GstClockTime ts)
-{
-  fprintf(stderr, "vader start %lld\n", ts);
-  return FALSE;
-}
-
-static gboolean
-vader_stop(const GstElement* asr, GstClockTime ts)
-{
-  fprintf(stderr, "vader stop %lld\n", ts);
-  return FALSE;
-}
-
-static gboolean
-asr_partial_result(const GstElement* asr, char const *hyp, char const *uttid)
-{
-  fprintf(stderr, "partial result hyp: %s uttid: %s\n", hyp, uttid);
-  return FALSE;
-}
-
-static gboolean
-asr_result(const GstElement* asr, char const *hyp, char const *uttid)
-{
-  fprintf(stderr, "result uttid: %s hyp: %s\n", uttid, hyp);
-  waiting_result = 0;
-  strcpy(result, hyp);
-  return FALSE;
-}
 
 static GValue g_true = G_VALUE_INIT;
 
@@ -95,19 +63,14 @@ void start(int argc_p, char *argv_p[])
 
   /* set up vader */
   vader = gst_bin_get_by_name((GstBin *)pipeline, "vad");
-  g_signal_connect(vader, "vader_start", G_CALLBACK(vader_start), NULL);
-  g_signal_connect(vader, "vader_stop", G_CALLBACK(vader_stop), NULL);
+  register_gst_vader_callbacks(vader);
 
   /* set up asr */
   asr = gst_bin_get_by_name((GstBin *)pipeline, "asr");
-  g_signal_connect(asr, "partial_result", G_CALLBACK(asr_partial_result), NULL);
-  g_signal_connect(asr, "result", G_CALLBACK(asr_result), NULL);
+  register_gst_asr_callbacks(asr);
   set_asr_properties((GObject *)asr);
 
   g_object_get((GObject *)asr, "decoder", &ps, NULL);
-
-  /* Start pipeline */
-  gst_element_set_state (pipeline, GST_STATE_PLAYING);
 
   gst_object_unref(vader);
   gst_object_unref(asr);
@@ -117,12 +80,13 @@ void start(int argc_p, char *argv_p[])
 
 void stop()
 {
-  g_value_unset(&g_true);
+  abort_recognition();
+  gst_element_set_state (pipeline, GST_STATE_NULL);
 
   t2p_stop();
 
   /* Free resources */
-  gst_element_set_state (pipeline, GST_STATE_NULL);
+  g_value_unset(&g_true);
   gst_object_unref (pipeline);
 }
 
@@ -158,13 +122,13 @@ static void vader_force_silent()
   g_object_set_property((GObject *)vader, "silent", &g_true);
 }
 
-int recognize(char **candidates[], char *unknown[])
+static hash_table_t *index_map;
+
+int start_recognition(char **candidates[], char *unknown[])
 {
   fsg_model_t *fsg;
   fsg_set_t* fsgs;
   int candidate_length;
-  hash_table_t *index_map;
-  int result_index;
 
   vader_force_silent();
 
@@ -179,24 +143,42 @@ int recognize(char **candidates[], char *unknown[])
     return -1;
   fsg_set_select(fsgs, fsg_model_name(fsg));
   ps_update_fsgset(ps);
+  gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+  if (index_map != NULL) {
+    hash_table_free(index_map);
+    index_map = NULL;
+  }
 
   index_map = hash_table_new(candidate_length * 2, HASH_CASE_YES);
   for (int i = 0; i < candidate_length; ++i) {
     (void)hash_table_enter_int32(index_map, join(candidates[i]), i);
   }
 
- retry:
-  waiting_result = 1;
-  strcpy(result, "");
+  return 0;
+}
 
-  while (waiting_result) {
-    usleep(1000);
+void abort_recognition()
+{
+  vader_force_silent();
+  gst_element_set_state (pipeline, GST_STATE_PAUSED);
+
+  if (index_map != NULL) {
+    hash_table_free(index_map);
+    index_map = NULL;
   }
+}
 
-  if (hash_table_lookup_int32(index_map, result, &result_index) == - 1)
-    goto retry;
+int find_recognized_index(char const *hyp, char const *uttid)
+{
+  int result_index;
 
-  hash_table_free(index_map);
+  if (index_map == NULL)
+    return -1;
 
+  if (hash_table_lookup_int32(index_map, hyp, &result_index) == - 1)
+    return -1;
+
+  abort_recognition();
   return result_index;
 }

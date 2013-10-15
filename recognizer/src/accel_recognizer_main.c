@@ -5,6 +5,20 @@
 
 #include "../include/accel_recognizer.h"
 
+char *raw_query[] = {
+  "QUEUE",
+  "ARRAY TO CHAR SEQUENCE",
+  "REQUIRE",
+  "ARGS",
+  NULL
+};
+
+char *unknown[] = {
+  "ARGS",
+  "ARGS",
+  NULL
+};
+
 int length_of(void **ptr)
 {
   int length = 0;
@@ -13,20 +27,15 @@ int length_of(void **ptr)
   return length;
 }
 
+static int done = FALSE;
+
+void result(int index) {
+  printf("%s\n", raw_query[index]);
+  done = TRUE;
+}
+
 int main(int argc, char *argv[])
 {
-  char *raw_query[] = {
-    "QUEUE",
-    "ARRAY TO CHAR SEQUENCE",
-    "REQUIRE",
-    "ARGS",
-    NULL
-  };
-  char *unknown[] = {
-    "ARGS",
-    "ARGS",
-    NULL
-  };
   char ***query;
 
   query = ckd_calloc(length_of((void *)raw_query), sizeof(char **));
@@ -51,7 +60,15 @@ int main(int argc, char *argv[])
 
   start(argc, argv);
 
-  printf("%s\n", raw_query[recognize(query, unknown)]);
+  start_recognition(query, unknown);
+
+  register_cb_recognized(result);
+
+  while (!done) {
+    usleep(100000);
+  }
+
+  abort_recognition();
 
   stop();
   return 0;
