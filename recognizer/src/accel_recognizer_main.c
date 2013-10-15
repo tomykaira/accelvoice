@@ -19,11 +19,12 @@ int main(int argc, char *argv[])
     "QUEUE",
     "ARRAY TO CHAR SEQUENCE",
     "REQUIRE",
-    "EQUIV",
+    "ARGS",
     NULL
   };
   char *unknown[] = {
-    "EQUIV",
+    "ARGS",
+    "ARGS",
     NULL
   };
   char ***query;

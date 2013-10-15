@@ -5,6 +5,7 @@
 #include "../include/accel_recognizer.h"
 #include "fsg.h"
 #include "t2p.h"
+#include "dict.h"
 
 #define HANDLE_G_ERROR(description) do { \
 if (err != NULL) { \
@@ -134,16 +135,8 @@ int recognize(char **candidates[], char *unknown[])
 
   candidate_length = count_candidates(candidates);
 
-  for (int i = 0; unknown[i] != NULL; ++i) {
-    char * phones = synthesize_phones(unknown[i]);
-    fprintf(stderr, "%s -> \"%s\"\n", unknown[i], phones);
-    if (ps_add_word(ps, unknown[i], phones, TRUE) < 0) {
-      fprintf(stderr, "Failed to add word %s\n", unknown[i]);
-      free(phones);
-      return -1;
-    }
-    free(phones);
-  }
+  if (insert_unknown_words(ps, unknown) < 0)
+    return -1;
 
   fsg = build_dynamic_fsg(ps, LW, candidates, candidate_length);
   fsgs = ps_get_fsgset(ps);
