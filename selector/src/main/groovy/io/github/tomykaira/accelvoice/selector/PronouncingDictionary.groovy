@@ -39,7 +39,11 @@ class PronouncingDictionary {
     }
 
     @Lazy
-    public static PronouncingDictionary fromResource =
-        this.class.getResource("/java_cmudict.dic").withReader { reader ->
+    public static PronouncingDictionary fromResource = loadFromResource()
+
+    private static PronouncingDictionary loadFromResource() {
+        PronouncingDictionary.class.getResource("/java_cmudict.dic").withReader { reader ->
             fromLines(reader.readLines())
-        }}
+        }
+    }
+}
