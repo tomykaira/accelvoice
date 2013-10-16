@@ -5,17 +5,17 @@ import com.intellij.codeInsight.completion.CompletionProgressIndicator;
 import com.intellij.codeInsight.completion.impl.CompletionServiceImpl;
 import com.intellij.codeInsight.lookup.Lookup;
 import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.impl.LookupImpl;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.CommandProcessor;
 import com.intellij.openapi.diagnostic.Logger;
 import io.github.tomykaira.accelvoice.selector.CandidatesCollection;
 import io.github.tomykaira.accelvoice.selector.RecognizerLibrary;
+import io.github.tomykaira.accelvoice.selector.SelectionListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompletionExecutor {
+public class CompletionExecutor implements SelectionListener {
     private static final Logger LOG = Logger.getInstance(CompletionExecutor.class.getName());
     private final RecognizerLibrary library;
     private final VocalCompletionListener listener;
@@ -52,12 +52,31 @@ public class CompletionExecutor {
         if (currentIndicator == null) {
             LOG.info("Starting recognition");
             currentIndicator = indicator;
-            LookupElement result = selectCandidate(indicator);
-            selectCandidate(result);
+            startRecognition(indicator);
         } else if (currentIndicator != indicator) {
             stopRecognition();
             prepareVocalCompletion(indicator);
         } // Do nothing if current is the same as given
+    }
+
+    private void startRecognition(CompletionProgressIndicator indicator) {
+        List<LookupElement> candidates = indicator.getLookup().getItems();
+        List<String> lookupStrings = new ArrayList<>();
+        for (LookupElement candidate : candidates) {
+            lookupStrings.add(candidate.getLookupString());
+        }
+        CandidatesCollection collection = new CandidatesCollection(lookupStrings, this);
+        collection.select();
+    }
+
+    @Override
+    public void notify(String selected) {
+        if (currentIndicator == null)
+            return;
+        for (LookupElement candidate : currentIndicator.getLookup().getItems()) {
+            if (candidate.getLookupString().equals(selected))
+                selectCandidate(candidate);
+        }
     }
 
     private void selectCandidate(final LookupElement selected) {
@@ -78,30 +97,14 @@ public class CompletionExecutor {
                         indicator.getLookup().finishLookup(Lookup.AUTO_INSERT_SELECT_CHAR, selected);
                     }
                 }, "AccelVoice Autocompletion", null);
-                CompletionServiceImpl.setCompletionPhase(CompletionPhase.NoCompletion);
             }
         });
-    }
-
-    private LookupElement selectCandidate(CompletionProgressIndicator indicator) {
-        List<LookupElement> candidates = indicator.getLookup().getItems();
-        List<String> lookupStrings = new ArrayList<>();
-        for (LookupElement candidate : candidates) {
-            lookupStrings.add(candidate.getLookupString());
-        }
-        CandidatesCollection collection = new CandidatesCollection(lookupStrings);
-        // TODO: asynchronous call
-        String result = collection.select();
-        for (LookupElement candidate : candidates) {
-            if (candidate.getLookupString().equals(result))
-                return candidate;
-        }
-        return null;
     }
 
     public void stopRecognition() {
         if (currentIndicator != null) {
             LOG.info("Stopping recognition");
+            RecognizerLibrary.INSTANCE.abort_recognition();
             currentIndicator = null;
         }
     }
