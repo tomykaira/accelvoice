@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 {
   char ***query;
 
-  query = ckd_calloc(length_of((void *)raw_query), sizeof(char **));
+  query = ckd_calloc(length_of((void *)raw_query) + 1, sizeof(char **));
   for (int i = 0; raw_query[i]; ++i) {
     char buf[256];
     int ptr = 0;
