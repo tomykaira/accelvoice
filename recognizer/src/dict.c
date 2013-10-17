@@ -8,6 +8,19 @@
 static hash_table_t *inserted_words = NULL;
 static int word_id = 0;
 
+void dict_start()
+{
+  inserted_words = hash_table_new(HASH_TABLE_SIZE, HASH_CASE_NO);
+  word_id = 0;
+}
+
+void dict_stop()
+{
+  hash_table_free(inserted_words);
+  inserted_words = NULL;
+  word_id = 0;
+}
+
 /* acronym := unknown AND word length <= 3 */
 static int is_acronym(char *word)
 {
@@ -81,9 +94,6 @@ int insert_unknown_words(ps_decoder_t *ps, char *unknown[])
 {
   assert(ps != NULL);
   assert(unknown != NULL);
-  if (inserted_words == NULL) {
-    inserted_words = hash_table_new(HASH_TABLE_SIZE, HASH_CASE_NO);
-  }
 
   for (int i = 0; unknown[i] != NULL; ++i) {
     char * word = unknown[i];

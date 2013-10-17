@@ -3,6 +3,7 @@
 
 #include "pocketsphinx.h"
 
+void fsg_start();
 // 0 if succeeded
 int add_fsg_model(ps_decoder_t *ps, fsg_model_t *fsg);
 fsg_model_t *

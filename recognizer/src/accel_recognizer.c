@@ -75,6 +75,8 @@ void start(int argc_p, char *argv_p[])
   gst_object_unref(vader);
   gst_object_unref(asr);
 
+  fsg_start();
+  dict_start();
   t2p_start();
 }
 
@@ -84,6 +86,7 @@ void stop()
   gst_element_set_state (pipeline, GST_STATE_NULL);
 
   t2p_stop();
+  dict_stop();
 
   /* Free resources */
   g_value_unset(&g_true);

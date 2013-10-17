@@ -31,6 +31,11 @@ if (fsg_model_null_trans_add(fsg, i, j, logp)) { \
 
 static int name_id = 0;
 
+void fsg_start()
+{
+  name_id = 0;
+}
+
 static void next_name(char *buf)
 {
   sprintf(buf, "gram_%d", name_id++);
