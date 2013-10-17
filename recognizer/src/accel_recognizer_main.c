@@ -10,12 +10,14 @@ char *raw_query[] = {
   "ARRAY TO CHAR SEQUENCE",
   "REQUIRE",
   "ARGS",
+  "GUI",
   NULL
 };
 
 char *unknown[] = {
   "ARGS",
   "ARGS",
+  "GUI",
   NULL
 };
 
