@@ -48,7 +48,7 @@ public class CompletionExecutor implements SelectionListener {
 
     }
 
-    public void prepareVocalCompletion(CompletionProgressIndicator indicator) {
+    public void prepareVocalCompletion(final CompletionProgressIndicator indicator) {
         if (currentIndicator == null) {
             LOG.info("Starting recognition");
             currentIndicator = indicator;
@@ -104,8 +104,9 @@ public class CompletionExecutor implements SelectionListener {
     public void stopRecognition() {
         if (currentIndicator != null) {
             LOG.info("Stopping recognition");
-            RecognizerLibrary.INSTANCE.abort_recognition();
+            library.abort_recognition();
             currentIndicator = null;
+            listener.completionDone();
         }
     }
 

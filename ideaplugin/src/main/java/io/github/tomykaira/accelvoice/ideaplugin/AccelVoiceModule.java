@@ -3,9 +3,8 @@ package io.github.tomykaira.accelvoice.ideaplugin;
 import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.actionSystem.TypedAction;
-import com.intellij.openapi.module.ModuleComponent;
 import com.intellij.openapi.module.Module;
-import groovy.lang.GroovySystem;
+import com.intellij.openapi.module.ModuleComponent;
 import io.github.tomykaira.accelvoice.selector.RecognizerLibrary;
 import org.jetbrains.annotations.NotNull;
 
