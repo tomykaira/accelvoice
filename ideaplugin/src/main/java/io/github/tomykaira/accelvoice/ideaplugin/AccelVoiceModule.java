@@ -37,7 +37,6 @@ public class AccelVoiceModule implements ModuleComponent {
     }
 
     public void moduleAdded() {
-        System.err.println(System.getProperty("java.class.path"));
         EditorActionManager manager = EditorActionManager.getInstance();
         TypedAction typedAction = manager.getTypedAction();
 
