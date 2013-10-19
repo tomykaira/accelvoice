@@ -22,6 +22,9 @@
 
   <application-components>
     <!-- Add your application components here -->
+      <component>
+          <implementation-class>io.github.tomykaira.accelvoice.ideaplugin.AccelVoiceComponent</implementation-class>
+      </component>
   </application-components>
 
   <project-components>
@@ -38,9 +41,4 @@
   <extensions defaultExtensionNs="com.intellij">
     <!-- Add your extensions here -->
   </extensions>
-    <module-components>
-        <component>
-            <implementation-class>io.github.tomykaira.accelvoice.ideaplugin.AccelVoiceModule</implementation-class>
-        </component>
-    </module-components>
 </idea-plugin>
