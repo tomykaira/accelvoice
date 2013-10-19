@@ -19,7 +19,7 @@ public class CompletionExecutor implements SelectionListener {
     private static final Logger LOG = Logger.getInstance(CompletionExecutor.class.getName());
     private final RecognizerLibrary library;
     private final VocalCompletionListener listener;
-    private CompletionProgressIndicator currentIndicator;
+    private CompletionContext currentContext;
 
     public CompletionExecutor(RecognizerLibrary library, VocalCompletionListener listener) {
         this.library = library;
@@ -49,18 +49,18 @@ public class CompletionExecutor implements SelectionListener {
     }
 
     public void prepareVocalCompletion(final CompletionProgressIndicator indicator) {
-        if (currentIndicator == null) {
+        CompletionContext context = new CompletionContext(indicator);
+        if (currentContext == null) {
             LOG.info("Starting recognition");
-            currentIndicator = indicator;
-            startRecognition(indicator);
-        } else if (currentIndicator != indicator) {
+            currentContext = context;
+            startRecognition(context.candidates);
+        } else if (!context.equals(currentContext)) {
             stopRecognition();
             prepareVocalCompletion(indicator);
         } // Do nothing if current is the same as given
     }
 
-    private void startRecognition(CompletionProgressIndicator indicator) {
-        List<LookupElement> candidates = indicator.getLookup().getItems();
+    private void startRecognition(List<LookupElement> candidates) {
         List<String> lookupStrings = new ArrayList<>();
         for (LookupElement candidate : candidates) {
             lookupStrings.add(candidate.getLookupString());
@@ -71,26 +71,28 @@ public class CompletionExecutor implements SelectionListener {
 
     @Override
     public void notify(String selected) {
-        if (currentIndicator == null)
+        if (currentContext == null)
             return;
-        for (LookupElement candidate : currentIndicator.getLookup().getItems()) {
-            if (candidate.getLookupString().equals(selected))
+        for (LookupElement candidate : currentContext.candidates) {
+            if (candidate.getLookupString().equals(selected)) {
                 selectCandidate(candidate);
+                return;
+            }
         }
     }
 
     private void selectCandidate(final LookupElement selected) {
-        if (currentIndicator == null || selected == null)
+        if (currentContext == null || selected == null)
             return;
 
         ApplicationManager.getApplication().invokeLater(new Runnable() {
             @Override
             public void run() {
-                CommandProcessor.getInstance().executeCommand(currentIndicator.getProject(), new Runnable() {
+                CommandProcessor.getInstance().executeCommand(currentContext.indicator.getProject(), new Runnable() {
                     @Override
                     public void run() {
                         CompletionProgressIndicator indicator = CompletionServiceImpl.getCompletionPhase().indicator;
-                        if (currentIndicator != indicator) {
+                        if (currentContext.indicator != indicator) {
                             return;
                         }
                         indicator.setMergeCommand();
@@ -102,10 +104,10 @@ public class CompletionExecutor implements SelectionListener {
     }
 
     public void stopRecognition() {
-        if (currentIndicator != null) {
+        if (currentContext != null) {
             LOG.info("Stopping recognition");
             library.abort_recognition();
-            currentIndicator = null;
+            currentContext = null;
             listener.completionDone();
         }
     }
