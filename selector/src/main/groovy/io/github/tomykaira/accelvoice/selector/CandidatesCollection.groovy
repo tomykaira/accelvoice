@@ -36,10 +36,25 @@ class CandidatesCollection {
                 selectionListener.notify(selected)
             }
         })
+        dumpQuery(mapping.collect { it.words }, unknowns)
         def result = recognizerLibrary
                 .start_recognition(new SplitWordList(mapping.collect { it.words }), unknowns.toArray() as String[])
         if (result < 0)
             throw new RecognitionException()
+    }
+
+    private void dumpQuery(List<List<String>> words, List<String> unknown) {
+        def file = File.createTempFile("query", ".log")
+        file.withPrintWriter { writer ->
+            words.each {
+                writer.println(it.join(" "))
+            }
+            writer.println("")
+            unknown.each {
+                writer.println(it)
+            }
+        }
+        println("Query is dumped to " + file.toString())
     }
 
     @Immutable
