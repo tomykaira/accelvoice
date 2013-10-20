@@ -6,8 +6,7 @@ class CandidatesCollection {
     final List<String> candidates
     private String selected;
     RecognizerLibrary recognizerLibrary = RecognizerLibrary.INSTANCE
-    List<CandidatesCollection.TokenConversionMap> mapping
-    Normalizer normalizer = new Normalizer(PronouncingDictionary.fromResource)
+    final Normalizer normalizer = new Normalizer(PronouncingDictionary.fromResource)
     final SelectionListener selectionListener
 
     def CandidatesCollection(List<String> candidates, SelectionListener selectionListener) {
@@ -24,7 +23,7 @@ class CandidatesCollection {
             return
 
         def unknowns = new ArrayList<String>()
-        mapping = candidates.collect {
+        def mapping = candidates.collect {
             def result = normalizer.normalize(it)
             unknowns.addAll(result.unknowns)
             new TokenConversionMap(it, result.words)
@@ -43,7 +42,7 @@ class CandidatesCollection {
             throw new RecognitionException()
     }
 
-    private void dumpQuery(List<List<String>> words, List<String> unknown) {
+    private static void dumpQuery(List<List<String>> words, List<String> unknown) {
         def file = File.createTempFile("query", ".log")
         file.withPrintWriter { writer ->
             words.each {
