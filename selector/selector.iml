@@ -46,7 +46,7 @@
     <orderEntry type="module-library" exported="">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/ownCloud/graduation_thesis/voice/accelvoice/recognizer/build/lib/libaccel_recognizer.so" />
+          <root url="file://$MODULE_DIR$/../recognizer/build/lib/libaccel_recognizer.so" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
