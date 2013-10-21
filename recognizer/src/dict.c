@@ -73,6 +73,11 @@ static char *synthesize_acronym_phones(const char *word)
 
 static int insert_word(ps_decoder_t *ps, char *word, char*phones)
 {
+  if (strlen(phones) == 0) {
+    fprintf(stderr, "Invalid word %s: phones is empty\n", word);
+    return -1;
+  }
+
   if (hash_table_enter_int32(inserted_words, ckd_salloc(word), word_id) != word_id)
     return 0;
 
