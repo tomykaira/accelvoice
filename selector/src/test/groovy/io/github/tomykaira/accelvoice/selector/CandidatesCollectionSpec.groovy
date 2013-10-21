@@ -74,6 +74,19 @@ class CandidatesCollectionSpec extends Specification {
         collection.selected == "b"
     }
 
+    def "candidates collection should remove empty candidate"() {
+        when:
+        def candidates = ["a", "b", "!="]
+        def listener = new TestListener()
+        def collection = new CandidatesCollection(candidates, listener)
+        collection.setRecognizerLibrary(mockLibrary)
+        mockLibrary.response = 1
+        collection.select()
+
+        then:
+        mockLibrary.lastCandidates == [["A"], ["B"]]
+    }
+
     def "candidates collection should raise exception if nothing selected"() {
         when:
         def collection = new CandidatesCollection(candidates, null)

@@ -27,6 +27,8 @@ class CandidatesCollection {
             def result = normalizer.normalize(it)
             unknowns.addAll(result.unknowns)
             new TokenConversionMap(it, result.words)
+        }.findAll {
+            !it.words.isEmpty()
         }
 
         recognizerLibrary.register_cb_recognized(CallbackWrapper.callbackRecognized { result ->

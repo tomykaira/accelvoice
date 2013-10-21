@@ -34,6 +34,9 @@ class NormalizerSpec extends Specification {
         "back"       | ["BACK"]
         "Back"       | ["BACK"]
         "_back"      | ["BACK"]
+        "!back"      | ["BACK"]
+        "back ="     | ["BACK"]
+        "!="         | []
     }
 
     def "it should tokenize composite words"() {
@@ -49,6 +52,7 @@ class NormalizerSpec extends Specification {
         "BACK_LOG"   | ["BACK", "LOG"]
         "backLog"    | ["BACK", "LOG"]
         "backlog"    | ["BACK", "LOG"]
+        "back.log()" | ["BACK", "LOG"]
     }
 
     def "it should raise NormalizationFailed exception"() {

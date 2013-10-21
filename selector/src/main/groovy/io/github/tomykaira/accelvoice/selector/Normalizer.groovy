@@ -105,7 +105,7 @@ class Normalizer {
     }
 
     static List<String> upperCaseWords(String token) {
-        token.split("_").collect { it.toUpperCase() }.findAll { !it.isEmpty() }
+        token.toUpperCase().split("[^A-Z]").findAll { !it.isEmpty() }
     }
 
     @Immutable
