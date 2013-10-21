@@ -1,0 +1,12 @@
+apply plugin: 'application'
+apply plugin: "groovy"
+apply plugin: 'idea'
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:$ext.groovyVersion"
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+
+    compile project(':selector')
+}
+
+mainClassName = 'io.github.tomykaira.accelvoice.static.Server'
