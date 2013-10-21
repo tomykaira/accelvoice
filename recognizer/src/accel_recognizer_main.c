@@ -4,22 +4,7 @@
 #include "pocketsphinx.h"
 
 #include "../include/accel_recognizer.h"
-
-char *raw_query[] = {
-  "QUEUE",
-  "ARRAY TO CHAR SEQUENCE",
-  "REQUIRE",
-  "ARGS",
-  "GUI",
-  NULL
-};
-
-char *unknown[] = {
-  "ARGS",
-  "ARGS",
-  "GUI",
-  NULL
-};
+#include "dump_loader.h"
 
 int length_of(void **ptr)
 {
@@ -30,39 +15,32 @@ int length_of(void **ptr)
 }
 
 static int done = FALSE;
+char ***loaded_query = NULL;
+char **loaded_unknown = NULL;
 
 void result(int index) {
-  printf("%s\n", raw_query[index]);
+  char **answer = loaded_query[index];
+  int ptr = 0;
+  while (answer[ptr])
+    printf("%s ", answer[ptr++]);
+  printf("\n");
   done = TRUE;
 }
 
 int main(int argc, char *argv[])
 {
-  char ***query;
-
-  query = ckd_calloc(length_of((void *)raw_query) + 1, sizeof(char **));
-  for (int i = 0; raw_query[i]; ++i) {
-    char buf[256];
-    int ptr = 0;
-    int wc = 0;
-
-    query[i] = calloc(16, sizeof(char *));
-    for (int j = 0; raw_query[i][j]; ++j) {
-      if (raw_query[i][j] == ' ') {
-        buf[ptr++] = 0;
-        query[i][wc++] = ckd_salloc(buf);
-        ptr = 0;
-      } else {
-        buf[ptr++] = raw_query[i][j];
-      }
-    }
-    buf[ptr] = 0;
-    query[i][wc++] = ckd_salloc(buf);
+  if (argc >= 2) {
+    FILE *fp = fopen(argv[1], "r");
+    load_from_file(fp);
+    fclose(fp);
+  } else {
+    printf("Loading query from STDIN\n");
+    load_from_file(stdin);
   }
 
   start(argc, argv);
 
-  start_recognition(query, unknown);
+  start_recognition(loaded_query, loaded_unknown);
 
   register_cb_recognized(result);
 

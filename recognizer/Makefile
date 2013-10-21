@@ -23,7 +23,7 @@ $(LIB): $(SRC_FILES) $(LOCAL_HEADER_FILES) $(PUBLIC_HEADER_FILES)
 		`pkg-config --cflags --libs pocketsphinx sphinxbase gstreamer-0.10` \
 		 -lflite_cmu_us_kal -lflite_cmu_time_awb -lflite_cmu_us_kal16 -lflite_cmu_us_awb -lflite_cmu_us_rms -lflite_cmu_us_slt -lflite_usenglish -lflite_cmulex -lflite -lm -lasound
 
-$(BIN): src/accel_recognizer_main.c $(LIB)
+$(BIN): src/accel_recognizer_main.c src/dump_loader.c src/dump_loader.h $(LIB)
 	mkdir -p `dirname $(BIN)`
 	gcc $(CFLAGS) -o $@ $^ `pkg-config --cflags --libs pocketsphinx sphinxbase gstreamer-0.10`
 
