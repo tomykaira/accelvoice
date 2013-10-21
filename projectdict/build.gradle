@@ -9,4 +9,4 @@ dependencies {
     compile project(':selector')
 }
 
-mainClassName = 'io.github.tomykaira.accelvoice.static.Server'
+mainClassName = 'io.github.tomykaira.accelvoice.projectdict.Server'

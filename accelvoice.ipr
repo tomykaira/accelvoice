@@ -154,6 +154,7 @@
     <dictionary name="tomita">
       <words>
         <w>accel</w>
+        <w>trie</w>
       </words>
     </dictionary>
   </component>
@@ -161,7 +162,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/corpus/corpus.iml" filepath="$PROJECT_DIR$/corpus/corpus.iml" />
       <module fileurl="file://$PROJECT_DIR$/ideaplugin/ideaplugin.iml" filepath="$PROJECT_DIR$/ideaplugin/ideaplugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/projectdict/projectdict.iml" filepath="$PROJECT_DIR$/projectdict/projectdict.iml" />
       <module fileurl="file://$PROJECT_DIR$/selector/selector.iml" filepath="$PROJECT_DIR$/selector/selector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/static/static.iml" filepath="$PROJECT_DIR$/static/static.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_7" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
