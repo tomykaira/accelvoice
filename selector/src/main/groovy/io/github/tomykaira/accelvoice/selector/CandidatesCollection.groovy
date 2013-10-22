@@ -55,7 +55,6 @@ class CandidatesCollection {
                 writer.println(it)
             }
         }
-        println("Query is dumped to " + file.toString())
     }
 
     @Immutable
