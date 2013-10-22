@@ -108,5 +108,6 @@
         (process-send-eof accelvoice--current-process))
     (setq accelvoice--current-process nil)))
 
+(provide 'accelvoice)
 
 ;;; accelvoice.el ends here
