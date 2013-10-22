@@ -37,9 +37,7 @@ class Trie {
             children[""] = new Trie(count)
             return
         }
-        def coupleWith = children.find { p ->
-            !p.key.isEmpty() && p.key[0] == word[0]
-        }
+        def coupleWith = findCorrespondingChild(word)
         if (coupleWith == null) {
             children[word] = new Trie(count, ["": new Trie(count)])
             return
@@ -61,7 +59,7 @@ class Trie {
     }
 
     Trie find(String prefix, String used) {
-        def target = children.find { it.key[0] == prefix[0] }
+        def target = findCorrespondingChild(prefix)
         if (target == null)
             return new Trie()
         def (common, existing, remain) = commonPrefix(target.key, prefix)
@@ -71,6 +69,12 @@ class Trie {
             target.value.find(remain, used + common)
         } else {
             new Trie() // Not found
+        }
+    }
+
+    private def findCorrespondingChild(String word) {
+        children.find { p ->
+            !p.key.isEmpty() && p.key[0] == word[0]
         }
     }
 
