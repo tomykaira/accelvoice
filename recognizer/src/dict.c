@@ -1,5 +1,7 @@
 #include <assert.h>
 
+#include "sphinxbase/err.h"
+
 #include "dict.h"
 #include "t2p.h"
 
@@ -74,7 +76,7 @@ static char *synthesize_acronym_phones(const char *word)
 static int insert_word(ps_decoder_t *ps, char *word, char*phones)
 {
   if (strlen(phones) == 0) {
-    fprintf(stderr, "Invalid word %s: phones is empty\n", word);
+    E_ERROR("Invalid word %s: phones is empty\n", word);
     return -1;
   }
 
@@ -82,14 +84,14 @@ static int insert_word(ps_decoder_t *ps, char *word, char*phones)
     return 0;
 
   ++word_id;
-  fprintf(stderr, "%s -> \"%s\"\n", word, phones);
+  E_INFO("%s -> \"%s\"\n", word, phones);
 
   /*
     If update == TRUE, ps_add_word() calls search_reinit.
     It is called later in recognize(), so not necessary here.
   */
   if (ps_add_word(ps, word, phones, FALSE) < 0) {
-    fprintf(stderr, "Failed to add word %s\n", word);
+    E_ERROR("Failed to add word %s\n", word);
     return -1;
   }
   return 0;

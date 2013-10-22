@@ -1,3 +1,5 @@
+#include "sphinxbase/err.h"
+
 #include "../include/accel_recognizer.h"
 #include "callbacks.h"
 
@@ -24,7 +26,7 @@ void register_cb_recognized(cb_recognized new_cb)
 static gboolean
 vader_start(const GstElement* asr, GstClockTime ts)
 {
-  fprintf(stderr, "vader start %lld\n", ts);
+  E_INFO("vader start %lld\n", ts);
   if (current_cb_vader_start != NULL)
     current_cb_vader_start((long long)ts);
   return FALSE;
@@ -33,7 +35,7 @@ vader_start(const GstElement* asr, GstClockTime ts)
 static gboolean
 vader_stop(const GstElement* asr, GstClockTime ts)
 {
-  fprintf(stderr, "vader stop %lld\n", ts);
+  E_INFO("vader stop %lld\n", ts);
   if (current_cb_vader_stop != NULL)
     current_cb_vader_stop((long long)ts);
   return FALSE;
@@ -42,14 +44,14 @@ vader_stop(const GstElement* asr, GstClockTime ts)
 static gboolean
 asr_partial_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
-  fprintf(stderr, "partial result hyp: %s uttid: %s\n", hyp, uttid);
+  E_INFO("partial result hyp: %s uttid: %s\n", hyp, uttid);
   return FALSE;
 }
 
 static gboolean
 asr_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
-  fprintf(stderr, "result uttid: %s hyp: %s\n", uttid, hyp);
+  E_INFO("result uttid: %s hyp: %s\n", uttid, hyp);
   int index = find_recognized_index(hyp, uttid);
   if (current_cb_recognized != NULL && index >= 0)
     current_cb_recognized(index);

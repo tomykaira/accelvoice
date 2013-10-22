@@ -2,6 +2,8 @@
 #include <gst/gst.h>
 #include <unistd.h>
 
+#include "sphinxbase/err.h"
+
 #include "../include/accel_recognizer.h"
 #include "fsg.h"
 #include "t2p.h"
@@ -10,7 +12,7 @@
 
 #define HANDLE_G_ERROR(description) do { \
 if (err != NULL) { \
-  fprintf(stderr, "%s %s %s:%d\n", description, err->message, __FILE__, __LINE__); \
+  E_ERROR("%s %s\n", description, err->message); \
   g_error_free(err); \
   err = NULL; \
 } \
