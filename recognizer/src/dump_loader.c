@@ -47,7 +47,6 @@ static void** to_array_list(list *l)
     ptr++;
     l = l->next;
   }
-  printf("%d %d\n", ptr, length);
   assert(ptr == length);
   return result;
 }
@@ -98,7 +97,6 @@ int load_from_file(FILE *fp)
     if (buf[0] == '\n' || buf[0] == '\0')
       break;
     buf[strlen(buf) - 1] = '\0';
-    printf("buf %s\n", buf);
     unknown_cur->value = ckd_salloc(buf);
     unknown_cur->next = new_list();
     unknown_cur = unknown_cur->next;
