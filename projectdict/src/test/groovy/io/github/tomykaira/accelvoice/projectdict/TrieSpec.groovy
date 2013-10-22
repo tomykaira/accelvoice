@@ -63,6 +63,17 @@ class TrieSpec extends Specification {
         sub.children["go"].count == 1
     }
 
+    def "compose Trie tree from est, eval, e"() {
+        when:
+        def trie = compose("est\t3\neval\t1\ne\t1")
+
+        then:
+        def sub = trie.children["e"]
+        sub.children["st"].count == 3
+        sub.children["val"].count == 1
+        sub.children[""].count == 1
+    }
+
     def "find with prefix he"() {
         when:
         def trie = compose("hello\t3\nhelp\t2\nhell\t1")
@@ -87,5 +98,22 @@ class TrieSpec extends Specification {
 
         then:
         trie.find("heli") == new Trie()
+    }
+
+    def "find with prefix eve from every and everybody"() {
+        when:
+        def trie = compose("every\t1\neverybody\t1\n")
+        def found = trie.find("eve")
+
+        then:
+        found.toWordList() == ["every", "everybody"]
+    }
+
+    def "word list"() {
+        when:
+        def trie = compose("hello\t3\nhelp\t2\nhell\t1")
+
+        then:
+        trie.toWordList() == ["help", "hello", "hell"]
     }
 }

@@ -4,7 +4,6 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 @EqualsAndHashCode
-@ToString
 class Trie {
     int count
     Map<String, Trie> children
@@ -22,13 +21,27 @@ class Trie {
         this.children = children
     }
 
+    @Override
+    String toString() {
+        toString(0)
+    }
+
+    String toString(int indent) {
+        def h = " " * indent
+        count + "\n" + children.collect { p -> h + p.key + ": " + p.value.toString(indent + 2) }.join("\n")
+    }
+
     void insert(String word, int count) {
         this.count += count
+        if (word == '') {
+            children[""] = new Trie(count)
+            return
+        }
         def coupleWith = children.find { p ->
-            p.key[0] == word[0]
+            !p.key.isEmpty() && p.key[0] == word[0]
         }
         if (coupleWith == null) {
-            children[word] = new Trie(count)
+            children[word] = new Trie(count, ["": new Trie(count)])
             return
         }
         def (prefix, existing, adding) = commonPrefix(coupleWith.key, word)
@@ -73,5 +86,15 @@ class Trie {
         while (i < max && l[i] == r[i])
             i++
         [l.substring(0, i), l.substring(i), r.substring(i)]
+    }
+
+    List<String> toWordList() {
+        if (children.isEmpty())
+            return [""]
+        def result = []
+        children.each { child ->
+            result.addAll(child.value.toWordList().collect { child.key + it })
+        }
+        result
     }
 }
