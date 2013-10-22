@@ -82,8 +82,7 @@
             (result (replace-regexp-in-string "
 " "" output)))
         (setq accelvoice--current-completion nil)
-        (accelvoice--replace-region start end result)
-        (goto-char (+ start (length result))))
+        (accelvoice--replace-region start end result))
     (with-current-buffer (process-buffer process)
       (let ((moving (= (point) (process-mark process))))
         (save-excursion
