@@ -16,6 +16,6 @@ public class ResetRecognizerAction extends AnAction {
     public void actionPerformed(AnActionEvent event) {
         RecognizerLibrary library = RecognizerLibrary.INSTANCE;
         library.stop();
-        library.start(1, new String[]{"java"});
+        AccelVoiceComponent.startRecognizerWithLogFile();
     }
 }

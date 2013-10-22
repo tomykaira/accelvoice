@@ -7,6 +7,9 @@ import com.intellij.openapi.editor.actionSystem.TypedAction;
 import io.github.tomykaira.accelvoice.selector.RecognizerLibrary;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+
 public class AccelVoiceComponent implements ApplicationComponent {
     private static final Logger LOG = Logger.getInstance(AccelVoiceComponent.class.getName());
     private static final RecognizerLibrary library = RecognizerLibrary.INSTANCE;
@@ -17,7 +20,7 @@ public class AccelVoiceComponent implements ApplicationComponent {
     public void initComponent() {
         LOG.info("initComponent");
 
-        library.start(1, new String[]{"java"});
+        startRecognizerWithLogFile();
 
         EditorActionManager manager = EditorActionManager.getInstance();
         TypedAction typedAction = manager.getTypedAction();
@@ -34,5 +37,15 @@ public class AccelVoiceComponent implements ApplicationComponent {
     @NotNull
     public String getComponentName() {
         return "AccelVoiceComponent";
+    }
+
+    public static void startRecognizerWithLogFile() {
+        String tempFile = null;
+        try {
+            tempFile = File.createTempFile("recognizer", ".log").getPath();
+        } catch (IOException e) {
+            LOG.error("Failed to create log file", tempFile);
+        }
+        library.start(1, new String[]{"java"}, tempFile);
     }
 }

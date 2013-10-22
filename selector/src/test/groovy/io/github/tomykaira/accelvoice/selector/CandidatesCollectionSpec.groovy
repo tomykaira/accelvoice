@@ -12,7 +12,7 @@ class CandidatesCollectionSpec extends Specification {
         boolean failOnStart = false
 
         @Override
-        void start(int argc, String[] argv) {
+        void start(int argc, String[] argv, String logFile) {
             started = true
         }
 

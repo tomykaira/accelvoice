@@ -5,7 +5,7 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 public interface RecognizerLibrary extends com.sun.jna.Library {
-    public void start(int argc, java.lang.String[] argv);
+    public void start(int argc, java.lang.String[] argv, String logFile);
 
     public void stop();
 
