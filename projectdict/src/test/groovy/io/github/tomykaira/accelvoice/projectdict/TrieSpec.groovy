@@ -109,6 +109,14 @@ class TrieSpec extends Specification {
         found.toWordList() == ["every", "everybody"]
     }
 
+    def "find with empty string"() {
+        when:
+        def trie = compose("hello\t3\nhelp\t2\nhell\t1")
+
+        then:
+        trie.find("") == trie
+    }
+
     def "word list"() {
         when:
         def trie = compose("hello\t3\nhelp\t2\nhell\t1")

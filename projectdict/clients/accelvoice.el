@@ -64,12 +64,14 @@
   "Run vocal completion with the symbol at point"
   (interactive)
   (if accelvoice--current-process
-      (let* ((bounds (bounds-of-thing-at-point 'symbol))
-             (start (car bounds))
-             (end (cdr bounds))
-             (word (buffer-substring-no-properties start end)))
-        (setq accelvoice--current-completion
-              (list start end word))
+      (let ((bounds (bounds-of-thing-at-point 'symbol))
+            start end word)
+        (if bounds
+            (setq start (car bounds)
+                  end (cdr bounds)
+                  word (buffer-substring-no-properties start end))
+          (setq start (point) end (point) word ""))
+        (setq accelvoice--current-completion (list start end word))
         (process-send-string accelvoice--current-process (concat word "\n")))
     (error "accelvoice process is not running.  Start with accelvoice--start-projectdict command.")))
 

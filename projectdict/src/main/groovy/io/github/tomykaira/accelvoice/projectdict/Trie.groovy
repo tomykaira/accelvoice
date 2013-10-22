@@ -55,7 +55,10 @@ class Trie {
     }
 
     Trie find(String prefix) {
-        find(prefix, "")
+        if (prefix == '')
+            this
+        else
+            find(prefix, "")
     }
 
     Trie find(String prefix, String used) {
