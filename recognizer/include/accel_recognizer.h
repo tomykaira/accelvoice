@@ -8,7 +8,7 @@ typedef void (*cb_vader_start) (long long);
 typedef void (*cb_vader_stop) (long long);
 typedef void (*cb_recognized) (int);
 
-void start(int argc_p, char *argv_p[]);
+void start(int argc_p, char *argv_p[], char const *log_file);
 void stop();
 
 void register_cb_vader_start(cb_vader_start);

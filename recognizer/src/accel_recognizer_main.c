@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     load_from_file(stdin);
   }
 
-  start(argc, argv);
+  start(argc, argv, NULL);
 
   start_recognition(loaded_query, loaded_unknown);
 

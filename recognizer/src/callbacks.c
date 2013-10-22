@@ -2,6 +2,7 @@
 
 #include "../include/accel_recognizer.h"
 #include "callbacks.h"
+#include "logging.h"
 
 static cb_vader_start current_cb_vader_start = NULL;
 static cb_vader_stop current_cb_vader_stop = NULL;
@@ -26,6 +27,7 @@ void register_cb_recognized(cb_recognized new_cb)
 static gboolean
 vader_start(const GstElement* asr, GstClockTime ts)
 {
+  logging_set_fp();
   E_INFO("vader start %lld\n", ts);
   if (current_cb_vader_start != NULL)
     current_cb_vader_start((long long)ts);
@@ -35,6 +37,7 @@ vader_start(const GstElement* asr, GstClockTime ts)
 static gboolean
 vader_stop(const GstElement* asr, GstClockTime ts)
 {
+  logging_set_fp();
   E_INFO("vader stop %lld\n", ts);
   if (current_cb_vader_stop != NULL)
     current_cb_vader_stop((long long)ts);
@@ -44,6 +47,7 @@ vader_stop(const GstElement* asr, GstClockTime ts)
 static gboolean
 asr_partial_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
+  logging_set_fp();
   E_INFO("partial result hyp: %s uttid: %s\n", hyp, uttid);
   return FALSE;
 }
@@ -51,8 +55,9 @@ asr_partial_result(const GstElement* asr, char const *hyp, char const *uttid)
 static gboolean
 asr_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
-  E_INFO("result uttid: %s hyp: %s\n", uttid, hyp);
+  logging_set_fp();
   int index = find_recognized_index(hyp, uttid);
+  E_INFO("result uttid: %s hyp: %s\n", uttid, hyp);
   if (current_cb_recognized != NULL && index >= 0)
     current_cb_recognized(index);
   return FALSE;

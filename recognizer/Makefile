@@ -8,9 +8,9 @@ MODELDIR=`pkg-config --variable=modeldir pocketsphinx`
 DICT_SOURCE=../selector/src/main/resources/java_cmudict.dic
 CFLAGS=-g -std=gnu99 -Wall
 
-SRC=accel_recognizer fsg t2p dict callbacks
+SRC=accel_recognizer fsg t2p dict callbacks logging
 SRC_FILES=$(SRC:%=src/%.c)
-LOCAL_HEADERS=fsg t2p dict callbacks
+LOCAL_HEADERS=fsg t2p dict callbacks logging
 LOCAL_HEADER_FILES=$(LOCAL_HEADERS:%=src/%.h)
 PUBLIC_HEADERS=accel_recognizer
 PUBLIC_HEADER_FILES=$(PUBLIC_HEADERS:%=include/%.h)

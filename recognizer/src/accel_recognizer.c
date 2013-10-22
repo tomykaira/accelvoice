@@ -8,6 +8,7 @@
 #include "fsg.h"
 #include "t2p.h"
 #include "dict.h"
+#include "logging.h"
 #include "callbacks.h"
 
 #define HANDLE_G_ERROR(description) do { \
@@ -45,7 +46,7 @@ static void set_asr_properties(GObject *asr)
 static ps_decoder_t *ps = NULL;
 static GstElement *pipeline = NULL;
 
-void start(int argc_p, char *argv_p[])
+void start(int argc_p, char *argv_p[], char const *log_file)
 {
   GError *err = NULL;
   GstElement* vader = NULL;
@@ -55,6 +56,8 @@ void start(int argc_p, char *argv_p[])
 
   g_value_init(&g_true, G_TYPE_BOOLEAN);
   g_value_set_boolean(&g_true, TRUE);
+
+  logging_start(log_file);
 
   /* Initialize GStreamer */
   gst_init(&argc_p, &argv_p);
@@ -93,6 +96,8 @@ void stop()
   /* Free resources */
   g_value_unset(&g_true);
   gst_object_unref (pipeline);
+
+  logging_stop();
 }
 
 
