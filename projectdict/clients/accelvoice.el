@@ -86,7 +86,6 @@
     (with-current-buffer (process-buffer process)
       (let ((moving (= (point) (process-mark process))))
         (save-excursion
-          ;; テキストを挿入し、プロセスマーカを進める
           (goto-char (process-mark process))
           (insert output)
           (set-marker (process-mark process) (point)))
