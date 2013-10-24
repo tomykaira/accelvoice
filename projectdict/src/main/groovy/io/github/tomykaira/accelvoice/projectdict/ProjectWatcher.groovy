@@ -13,8 +13,8 @@ class ProjectWatcher {
     final Path projectRoot
     final List<Path> watchingDirectories = []
 
-    def ProjectWatcher(String projectRoot) {
-        this.projectRoot = Paths.get(projectRoot)
+    def ProjectWatcher(Path projectRoot) {
+        this.projectRoot = projectRoot
     }
 
     def watch() {
@@ -69,7 +69,7 @@ class ProjectWatcher {
     }
 
     public static void main(String[] args) {
-        ProjectWatcher watcher = new ProjectWatcher(args[0])
+        ProjectWatcher watcher = new ProjectWatcher(Paths.get(args[0]))
         watcher.watch()
     }
 }
