@@ -4,18 +4,18 @@ import io.github.tomykaira.accelvoice.selector.RecognizerLibrary
 import io.github.tomykaira.accelvoice.selector.SelectionListener
 
 class Server {
-    private final Trie trie
+    private final Project project
     private final File logFile
 
-    def Server(File dictionary, File logFile) {
-        trie = dictionary.withInputStream { is ->
-            new TrieComposer(is).constructTrie()
-        } as Trie
+    def Server(Project project, File logFile) {
+        this.project = project
         this.logFile = logFile
     }
 
     def run() {
-        def collector = new CandidatesCollector(trie)
+        project.startWatching()
+
+        def collector = new CandidatesCollector(project.trie)
         def listener = new SelectionListener() {
             @Override
             void notify(String selected) {
@@ -48,12 +48,12 @@ class Server {
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Specify project word bag")
+            System.err.println("Specify project")
             System.exit(1)
         }
         def logFile = args.length >= 2 ? new File(args[1]) : null
 
-        def server = new Server(new File(args[0]), logFile)
+        def server = new Server(new Project(args[0]), logFile)
         server.run()
     }
 }
