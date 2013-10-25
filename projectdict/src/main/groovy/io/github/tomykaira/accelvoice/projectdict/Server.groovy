@@ -49,6 +49,7 @@ class Server {
         def logFile = args.length >= 2 ? new File(args[1]) : null
         PropertyConfigurator.configure(log4jConfig(logFile))
 
+        logger.info("Starting projectdict server for " + args[0]);
         def server = new Server(new Project(args[0]), logFile)
         server.run()
     }
