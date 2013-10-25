@@ -8,11 +8,11 @@ class RubyTokenizerSpec extends Specification {
     def "tokenize an arithmetic line"() {
         when:
         def tokenizer = new RubyTokenizer()
-        tokenizer.tokenize("width * width * 3 == height")
+        tokenizer.tokenize("_width * _width * 3 == height3")
 
         then:
-        tokenizer.tokens["width"] == 2
-        tokenizer.tokens["height"] == 1
+        tokenizer.tokens["_width"] == 2
+        tokenizer.tokens["height3"] == 1
         tokenizer.tokens["3"] == null
     }
 

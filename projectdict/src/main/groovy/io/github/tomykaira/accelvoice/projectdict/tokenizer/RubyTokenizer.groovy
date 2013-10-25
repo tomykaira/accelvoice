@@ -8,16 +8,16 @@ class RubyTokenizer extends AbstractTokenizer {
                 "begin", "else", "in", "rescue", "undef", "__FILE__", "break", "elsif",
                 "module", "retry", "unless", "__ENCODING__", "case", "end", "next",
                 "return", "until"],
-        [~/(?m)#.*$/, ~/(?ms)^=begin$.*^=end$/, ~/(?s)__END__.*\z/])
+        ['(?m)#.*$', '(?ms)^=begin$.*^=end$', '(?s)__END__.*\\z'])
     }
 
     @Override
     protected boolean isIdentStart(char c) {
-        isAlpha(c) || c == cc('_')
+        isAlpha(c) || c == 0x5f
     }
 
     @Override
     protected boolean isIdentChar(char c) {
-        isAlpha(c) || isDigit(c) || c == cc('_')
+        isAlpha(c) || isDigit(c) || c == 0x5f // '_'
     }
 }
