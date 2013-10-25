@@ -45,7 +45,7 @@ abstract class AbstractTokenizer {
 
     abstract boolean isIdentChar(char c);
 
-    // Syntax suger to workaround groovy literal
+    // Syntax sugar to workaround groovy literal
     protected static char cc(String s) {
         s as char
     }
