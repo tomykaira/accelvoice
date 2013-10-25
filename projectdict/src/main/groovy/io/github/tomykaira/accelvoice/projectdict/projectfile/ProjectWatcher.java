@@ -1,16 +1,21 @@
 package io.github.tomykaira.accelvoice.projectdict.projectfile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjectWatcher {
-    private final Path projectRoot;
-    private final FileEventListener listener;
     private static final WatchEvent.Kind[] targetKinds =
             new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE};
+    private static final String IGNORE_FILE_NAME = ".accelignore";
+
+    private final Path projectRoot;
+    private final FileEventListener listener;
     private WatchService watcher;
+    private List<IgnoreRule> ignoreRules = new ArrayList<>();
 
     public ProjectWatcher(Path projectRoot, FileEventListener listener) {
         this.projectRoot = projectRoot;
@@ -21,7 +26,19 @@ public class ProjectWatcher {
         FileSystem fs = projectRoot.getFileSystem();
         watcher = fs.newWatchService();
 
-        watchRecursively(watcher, projectRoot.toFile());
+        File rootFile = projectRoot.toFile();
+        File ignoreRuleFile = new File(rootFile, IGNORE_FILE_NAME);
+        if (ignoreRuleFile.isFile()) {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(new FileInputStream(ignoreRuleFile), Charset.defaultCharset()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    ignoreRules.add(new IgnoreRule(line.trim()));
+                }
+            }
+        }
+
+        watchRecursively(watcher, rootFile);
     }
 
     public void watch() throws IOException, InterruptedException {
@@ -33,6 +50,8 @@ public class ProjectWatcher {
             final Path dir = pickDir(key);
             for (WatchEvent<?> event : key.pollEvents()) {
                 Path absolute = dir.resolve((Path)event.context());
+                if (isIgnored(absolute))
+                    continue;
                 File file = absolute.toFile();
                 WatchEvent.Kind<?> kind = event.kind();
                 if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
@@ -57,6 +76,8 @@ public class ProjectWatcher {
         root.toPath().register(watcher, targetKinds);
 
         for (File file : root.listFiles()) {
+            if (isIgnored(file.toPath()))
+                continue;
             if (file.isDirectory())
                 watchRecursively(watcher, file);
             else if (file.isFile())
@@ -72,6 +93,14 @@ public class ProjectWatcher {
         } catch (NoSuchFieldException|IllegalAccessException e) {
             throw new RuntimeException("Failed to access dir", e);
         }
+    }
+
+    private boolean isIgnored(Path path) {
+        for (IgnoreRule rule : ignoreRules) {
+            if (rule.match(projectRoot.relativize(path).toString()))
+                return true;
+        }
+        return false;
     }
 
     public static void main(String[] args) throws IOException, InterruptedException {
