@@ -28,13 +28,15 @@ class Trie {
 
     String toString(int indent) {
         def h = " " * indent
-        count + "\n" + children.collect { p -> h + p.key + ": " + p.value.toString(indent + 2) }.join("\n")
+        count + "\n" + children.collect { p -> h + "\"" + p.key + "\" " + p.value.toString(indent + 2) }.join("\n")
     }
 
     void insert(String word, int count) {
         this.count += count
         if (word == '') {
-            children[""] = new Trie(count)
+            if (children[""] == null)
+                children[""] = new Trie()
+            children[""].count += count
             return
         }
         def coupleWith = findCorrespondingChild(word)

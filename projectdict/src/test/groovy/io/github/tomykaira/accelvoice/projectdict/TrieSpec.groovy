@@ -74,6 +74,19 @@ class TrieSpec extends Specification {
         sub.children[""].count == 1
     }
 
+    def "insert the same word twice"() {
+        when:
+        def trie = new Trie()
+        trie.insert("foo", 1)
+        trie.insert("fuss", 2)
+        trie.insert("foo", 2)
+
+        then:
+        trie.children["f"].children["oo"].count == 3
+        trie.children["f"].children["oo"].children[""].count == 3
+        trie.children["f"].children["uss"].count == 2
+    }
+
     def "find with prefix he"() {
         when:
         def trie = compose("hello\t3\nhelp\t2\nhell\t1")
