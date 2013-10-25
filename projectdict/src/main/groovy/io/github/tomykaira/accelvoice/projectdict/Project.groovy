@@ -3,11 +3,13 @@ package io.github.tomykaira.accelvoice.projectdict
 import io.github.tomykaira.accelvoice.projectdict.projectfile.FileEventListener
 import io.github.tomykaira.accelvoice.projectdict.projectfile.ProjectWatcher
 import io.github.tomykaira.accelvoice.projectdict.tokenizer.RubyTokenizer
+import org.apache.log4j.Logger
 
 import java.nio.file.Path
 import java.nio.file.Paths
 
 class Project implements FileEventListener {
+    private static final Logger logger = Logger.getLogger(Project.class)
     private final Path projectRoot
     final Trie trie
     private final ProjectWatcher watcher
@@ -44,6 +46,7 @@ class Project implements FileEventListener {
         if (!tokenizer.matchExtension(file)) {
             return
         }
+        logger.debug("Add tokens in " + file.toString())
         tokenizer.tokenize(file.toFile().readLines().join("\n"))
         tokenizer.tokens.each { pair ->
             trie.insert(pair.key, pair.value)
