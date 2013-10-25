@@ -12,9 +12,11 @@ import java.nio.file.WatchService
 class ProjectWatcher {
     final Path projectRoot
     final List<Path> watchingDirectories = []
+    private final FileEventListener listener
 
-    def ProjectWatcher(Path projectRoot) {
+    def ProjectWatcher(Path projectRoot, FileEventListener listener) {
         this.projectRoot = projectRoot
+        this.listener = listener
     }
 
     def watch() {
@@ -29,18 +31,22 @@ class ProjectWatcher {
             List<WatchEvent<?>> events = key.pollEvents()
             events.each { event ->
                 def absolute = dir.resolve(event.context() as Path)
+                File file = absolute.toFile()
                 switch (event.kind()) {
                     case StandardWatchEventKinds.ENTRY_CREATE:
-                        println("Created " + absolute.toString())
-                        if (absolute.toFile().isDirectory()) {
+                        if (file.isDirectory()) {
                             watchRecursively(watcher, absolute)
+                        } else if (file.isFile()) {
+                            listener.fileCreated(absolute)
                         }
                         break
                     case StandardWatchEventKinds.ENTRY_MODIFY:
-                        println("Modified " + absolute.toString())
+                        if (file.isFile())
+                            listener.fileModified(absolute)
                         break
                     case StandardWatchEventKinds.ENTRY_DELETE:
-                        println("Deleted " + absolute.toString())
+                        if (file.isFile())
+                            listener.fileDeleted(absolute)
                         break
                 }
             }
@@ -48,7 +54,7 @@ class ProjectWatcher {
         }
     }
 
-    private WatchEvent.Kind[] targetKinds =
+    private static final WatchEvent.Kind[] targetKinds =
         [StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE]
 
     private void watchRecursively(WatchService watcher, Path root) {
@@ -57,8 +63,11 @@ class ProjectWatcher {
 
         root.toFile().list().each {
             def path = root.resolve(it)
-            if (path.toFile().isDirectory())
+            def file = path.toFile()
+            if (file.isDirectory())
                 watchRecursively(watcher, path)
+            else if (file.isFile())
+                listener.fileCreated(path)
         }
     }
 
@@ -69,7 +78,24 @@ class ProjectWatcher {
     }
 
     public static void main(String[] args) {
-        ProjectWatcher watcher = new ProjectWatcher(Paths.get(args[0]))
+        def printListener = new FileEventListener() {
+            @Override
+            void fileCreated(Path file) {
+                println("File created " + file)
+            }
+
+            @Override
+            void fileModified(Path file) {
+                println("File modified " + file)
+                //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            @Override
+            void fileDeleted(Path file) {
+                println("File deleted " + file)
+            }
+        }
+        ProjectWatcher watcher = new ProjectWatcher(Paths.get(args[0]), printListener)
         watcher.watch()
     }
 }
