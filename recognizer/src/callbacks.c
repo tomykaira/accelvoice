@@ -57,7 +57,7 @@ asr_result(const GstElement* asr, char const *hyp, char const *uttid)
 {
   logging_set_fp();
   int index = find_recognized_index(hyp, uttid);
-  E_INFO("result uttid: %s hyp: %s\n", uttid, hyp);
+  E_INFO("result uttid: %s hyp: %s (%d)\n", uttid, hyp, index);
   if (current_cb_recognized != NULL && index >= 0)
     current_cb_recognized(index);
   return FALSE;
