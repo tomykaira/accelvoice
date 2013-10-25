@@ -67,5 +67,6 @@ test test
         then:
         tokenizer.matchExtension(Paths.get("/tmp/test.rb"))
         !tokenizer.matchExtension(Paths.get("/tmp/test.rb.gz"))
+        !tokenizer.matchExtension(Paths.get("/tmp/test.erb"))
     }
 }
