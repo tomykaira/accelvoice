@@ -1,5 +1,6 @@
 package io.github.tomykaira.accelvoice.projectdict.tokenizer
 
+import java.nio.file.Path
 import java.util.regex.Pattern
 
 abstract class AbstractTokenizer {
@@ -56,5 +57,10 @@ abstract class AbstractTokenizer {
 
     protected static boolean isDigit(char c) {
         cc('0') <= c && c <= cc('9')
+    }
+
+    boolean matchExtension(Path path) {
+        String name = path.getFileName()
+        extensions.any { name.endsWith(it) }
     }
 }

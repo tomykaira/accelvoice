@@ -2,6 +2,8 @@ package io.github.tomykaira.accelvoice.projectdict.tokenizer
 
 import spock.lang.Specification
 
+import java.nio.file.Paths
+
 class RubyTokenizerSpec extends Specification {
     def "tokenize an arithmetic line"() {
         when:
@@ -56,5 +58,14 @@ test test
         "test"     | 3
         "call"     | 2
         "this"     | null
+    }
+
+    def ".matchExtension()"() {
+        when:
+        def tokenizer = new RubyTokenizer()
+
+        then:
+        tokenizer.matchExtension(Paths.get("/tmp/test.rb"))
+        !tokenizer.matchExtension(Paths.get("/tmp/test.rb.gz"))
     }
 }
