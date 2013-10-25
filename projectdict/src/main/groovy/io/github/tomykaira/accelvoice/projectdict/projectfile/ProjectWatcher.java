@@ -33,6 +33,8 @@ public class ProjectWatcher {
                     new InputStreamReader(new FileInputStream(ignoreRuleFile), Charset.defaultCharset()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
+                    if (line.isEmpty() || line.charAt(0) == '#')
+                        continue;
                     ignoreRules.add(new IgnoreRule(line.trim()));
                 }
             }
