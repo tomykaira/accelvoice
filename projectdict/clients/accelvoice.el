@@ -50,14 +50,14 @@
 ;; functions
 
 (defun accelvoice--start-projectdict ()
-  "Start accelvoice backend process specifying dictionary file"
+  "Start accelvoice backend process specifying project root directory"
   (interactive)
   (when accelvoice--current-process
     (accelvoice--stop-projectdict))
-  (let ((dictionary (expand-file-name (read-file-name "Dictionary: ")))
+  (let ((project-root (expand-file-name (read-file-name "Project root: ")))
         (log (expand-file-name accelvoice--logfile)))
     (setq accelvoice--current-process
-          (start-process "projectdict" "projectdict" accelvoice--projectdict-path dictionary log))
+          (start-process "projectdict" "projectdict" accelvoice--projectdict-path project-root log))
     (set-process-filter accelvoice--current-process 'accelvoice--process-filter)))
 
 (defun accelvoice--complete ()
