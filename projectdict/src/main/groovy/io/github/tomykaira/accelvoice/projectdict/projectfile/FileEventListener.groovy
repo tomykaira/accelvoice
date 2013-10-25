@@ -1,4 +1,4 @@
-package io.github.tomykaira.accelvoice.projectdict
+package io.github.tomykaira.accelvoice.projectdict.projectfile
 
 import java.nio.file.Path
 

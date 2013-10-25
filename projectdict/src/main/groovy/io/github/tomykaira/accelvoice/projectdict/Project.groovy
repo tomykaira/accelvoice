@@ -1,5 +1,7 @@
 package io.github.tomykaira.accelvoice.projectdict
 
+import io.github.tomykaira.accelvoice.projectdict.projectfile.FileEventListener
+import io.github.tomykaira.accelvoice.projectdict.projectfile.ProjectWatcher
 import io.github.tomykaira.accelvoice.projectdict.tokenizer.RubyTokenizer
 
 import java.nio.file.Path
