@@ -1,15 +1,9 @@
 package io.github.tomykaira.accelvoice.projectdict.tokenizer;
 
-import groovy.lang.Closure;
-import groovy.lang.Reference;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public abstract class AbstractTokenizer {
     private final List<String> extensions;
@@ -24,29 +18,30 @@ public abstract class AbstractTokenizer {
     }
 
     public void tokenize(String code) {
-        final List<Character> buf = new ArrayList<Character>();
+        StringBuilder builder = new StringBuilder(32);
         for (String pattern : commentPatterns) {
             code = code.replaceAll(pattern, "");
         }
         for (char c : code.toCharArray()) {
-            if (buf.isEmpty() && isIdentStart(c) || !buf.isEmpty() && isIdentChar(c)) {
-                buf.add(c);
-            } else if (!buf.isEmpty()) {
-                insert(buf);
+            if (builder.length() == 0 && isIdentStart(c) || builder.length() != 0 && isIdentChar(c)) {
+                builder.append(c);
+            } else if (builder.length() != 0) {
+                insert(builder);
+
             }
         }
-        if (!buf.isEmpty()) {
-            insert(buf);
+        if (builder.length() != 0) {
+            insert(builder);
         }
     }
 
-    protected void insert(List<Character> buffer) {
-        String token = DefaultGroovyMethods.join(buffer, "");
+    protected void insert(StringBuilder builder) {
+        String token = builder.toString();
         if (keywords.indexOf(token) == -1) {
             final Integer i = tokens.get(token);
             tokens.put(token, (i == null ? 0 : i) + 1);
         }
-        buffer.clear();
+        builder.delete(0, token.length());
     }
 
     protected abstract boolean isIdentStart(char c);
