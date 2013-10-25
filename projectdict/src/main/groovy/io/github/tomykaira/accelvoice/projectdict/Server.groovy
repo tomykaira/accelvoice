@@ -2,8 +2,11 @@ package io.github.tomykaira.accelvoice.projectdict
 
 import io.github.tomykaira.accelvoice.selector.RecognizerLibrary
 import io.github.tomykaira.accelvoice.selector.SelectionListener
+import org.apache.log4j.Logger
+import org.apache.log4j.PropertyConfigurator
 
 class Server {
+    private static final Logger logger = Logger.getLogger(Server.class)
     private final Project project
     private final File logFile
 
@@ -13,37 +16,29 @@ class Server {
     }
 
     def run() {
+        def start = System.nanoTime()
         project.startWatching()
 
         def collector = new CandidatesCollector(project.trie)
         def listener = new SelectionListener() {
             @Override
             void notify(String selected) {
-                log("Result: " + selected)
+                logger.info("Result: " + selected)
                 println(selected)
             }
         }
 
         RecognizerLibrary.INSTANCE.start(1, {"java"} as String[], logFile?.toString())
 
+        logger.info("System initialized in " + (System.nanoTime() - start) / 1000_000)
+
         System.in.eachLine { line ->
             def collection = collector.completeByPrefix(line, listener)
-            log(collection.candidates.join(" "))
+            logger.info(collection.candidates.join(" "))
             collection.select()
         }
 
         RecognizerLibrary.INSTANCE.stop()
-    }
-
-    private def log(String content) {
-        def data = "INFO: Server: " + content
-        if (logFile == null) {
-            println(data)
-        } else {
-            logFile.withWriterAppend { w ->
-                w.write(data + "\n")
-            }
-        }
     }
 
     public static void main(String[] args) {
@@ -52,8 +47,24 @@ class Server {
             System.exit(1)
         }
         def logFile = args.length >= 2 ? new File(args[1]) : null
+        PropertyConfigurator.configure(log4jConfig(logFile))
 
         def server = new Server(new Project(args[0]), logFile)
         server.run()
+    }
+
+    private static Properties log4jConfig(File logFile) {
+        Properties properties = new Properties()
+        properties.setProperty("log4j.rootLogger", "INFO, ROOT")
+        if (logFile == null) {
+            properties.setProperty("log4j.appender.ROOT", "org.apache.log4j.ConsoleAppender")
+        } else {
+            properties.setProperty("log4j.appender.ROOT", "org.apache.log4j.FileAppender")
+            properties.setProperty("log4j.appender.ROOT.File", logFile.absolutePath)
+            properties.setProperty("log4j.appender.ROOT.Append", "true")
+        }
+        properties.setProperty("log4j.appender.ROOT.layout", "org.apache.log4j.PatternLayout")
+        properties.setProperty("log4j.appender.ROOT.layout.ConversionPattern", "%d [%t] %-5p %c - %m%n")
+        properties
     }
 }
