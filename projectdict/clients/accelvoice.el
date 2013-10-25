@@ -104,8 +104,7 @@
   (setq accelvoice--current-completion nil)
   (when accelvoice--current-process
     (when (eq 'run (process-status accelvoice--current-process))
-        (process-send-eof accelvoice--current-process)
-        (kill-process accelvoice--current-process))
+        (process-send-eof accelvoice--current-process))
     (setq accelvoice--current-process nil)))
 
 (provide 'accelvoice)

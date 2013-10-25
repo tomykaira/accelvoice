@@ -52,6 +52,7 @@ class Server {
         logger.info("Starting projectdict server for " + args[0]);
         def server = new Server(new Project(args[0]), logFile)
         server.run()
+        System.exit(0) // to stop threads forcefully
     }
 
     private static Properties log4jConfig(File logFile) {
