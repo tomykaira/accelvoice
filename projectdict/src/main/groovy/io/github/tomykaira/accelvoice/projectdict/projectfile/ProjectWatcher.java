@@ -6,23 +6,28 @@ import java.lang.reflect.Field;
 import java.nio.file.*;
 
 public class ProjectWatcher {
-
     private final Path projectRoot;
     private final FileEventListener listener;
     private static final WatchEvent.Kind[] targetKinds =
             new WatchEvent.Kind[]{StandardWatchEventKinds.ENTRY_MODIFY, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE};
+    private WatchService watcher;
 
     public ProjectWatcher(Path projectRoot, FileEventListener listener) {
         this.projectRoot = projectRoot;
         this.listener = listener;
     }
 
-    public void watch() throws IOException, InterruptedException {
+    public void initialize() throws IOException {
         FileSystem fs = projectRoot.getFileSystem();
-        final WatchService watcher = fs.newWatchService();
+        watcher = fs.newWatchService();
 
         watchRecursively(watcher, projectRoot.toFile());
+    }
 
+    public void watch() throws IOException, InterruptedException {
+        if (watcher == null) {
+            throw new RuntimeException("This ProjectWatcher is not initialized");
+        }
         while (true) {
             WatchKey key = watcher.take();
             final Path dir = pickDir(key);

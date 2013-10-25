@@ -23,6 +23,7 @@ class Project implements FileEventListener {
     }
 
     def startWatching() {
+        watcher.initialize()
         Thread.start {
             watcher.watch()
         }
