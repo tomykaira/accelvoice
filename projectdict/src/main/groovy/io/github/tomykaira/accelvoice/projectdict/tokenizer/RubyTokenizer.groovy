@@ -12,12 +12,12 @@ class RubyTokenizer extends AbstractTokenizer {
     }
 
     @Override
-    boolean isIdentStart(char c) {
+    protected boolean isIdentStart(char c) {
         isAlpha(c) || c == cc('_')
     }
 
     @Override
-    boolean isIdentChar(char c) {
+    protected boolean isIdentChar(char c) {
         isAlpha(c) || isDigit(c) || c == cc('_')
     }
 }

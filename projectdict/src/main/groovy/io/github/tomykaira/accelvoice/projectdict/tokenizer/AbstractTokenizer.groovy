@@ -10,7 +10,7 @@ abstract class AbstractTokenizer {
 
     private final List<Pattern> commentPatterns
 
-    protected final Map<String, Integer> tokens = [:]
+    final Map<String, Integer> tokens = [:]
 
     def AbstractTokenizer(List<String> extensions, List<String> keywords, List<Pattern> commentPatterns) {
         this.extensions = extensions
@@ -42,9 +42,9 @@ abstract class AbstractTokenizer {
         buffer.clear()
     }
 
-    abstract boolean isIdentStart(char c);
+    abstract protected boolean isIdentStart(char c);
 
-    abstract boolean isIdentChar(char c);
+    abstract protected boolean isIdentChar(char c);
 
     // Syntax sugar to workaround groovy literal
     protected static char cc(String s) {
