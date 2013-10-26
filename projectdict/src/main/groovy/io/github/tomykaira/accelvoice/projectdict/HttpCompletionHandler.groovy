@@ -67,7 +67,7 @@ class HttpCompletionHandler implements HttpHandler {
         activeTag = tag
 
         [
-                tag: tag,
+                tag: tag.toString(),
                 candidate_count: collection.candidates.size()
         ]
     }
