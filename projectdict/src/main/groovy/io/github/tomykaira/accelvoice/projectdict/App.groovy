@@ -15,7 +15,7 @@ class App {
         PropertyConfigurator.configure(log4jConfig(logFile))
 
         logger.info("Starting projectdict server for " + args[0]);
-        def server = new StandardIOServer(new Project(args[0]), logFile)
+        def server = new HttpServer(new Project(args[0]), logFile)
         server.run()
         System.exit(0) // to stop threads forcefully
     }
