@@ -61,7 +61,7 @@ class HttpCompletionHandler implements HttpHandler {
         def listener = listenerForTag(tag)
         def collection = collector.completeByPrefix(prefix, listener)
 
-        logger.info("$tag: complete $prefix from ${collection.candidates.size()}")
+        logger.info("$tag: complete $prefix from ${collection.candidates.join(" ")}")
 
         collection.select()
         activeTag = tag
