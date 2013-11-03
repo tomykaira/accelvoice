@@ -4,8 +4,7 @@ import io.github.tomykaira.accelvoice.selector.CandidatesCollection;
 import io.github.tomykaira.accelvoice.selector.RecognizerLibrary;
 import io.github.tomykaira.accelvoice.selector.SelectionListener;
 import org.apache.log4j.Logger;
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,6 +16,15 @@ import java.util.Properties;
 public class App {
     private static final Logger logger = Logger.getLogger(App.class);
 
+    private static final SelectionListener listener = new SelectionListener() {
+        @Override
+        public void notify(String selected) {
+            logger.info("Result: " + selected);
+            System.out.println(selected);
+        }
+
+    };
+
     public static void main(String[] args) throws IOException {
         File logFile;
         if (args.length == 0) {
@@ -25,32 +33,38 @@ public class App {
             logFile = new File(args[0]);
         }
 
-        log4jConfig(logFile);
+        PropertyConfigurator.configure(log4jConfig(logFile));
+        RecognizerLibrary.INSTANCE.start(1, new String[]{"Java"}, logFile.toString());
 
-        final SelectionListener listener = new SelectionListener() {
-            @Override
-            public void notify(String selected) {
-                logger.info("Result: " + selected);
-                System.out.println(selected);
-            }
-
-        };
-
-        registerSignalHandler();
-
-        try (BufferedReader stream = new BufferedReader(new InputStreamReader(System.in))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String line;
-            while ((line = stream.readLine()) != null) {
-                CandidatesCollection collection = new Find(Paths.get(line)).findCandidates(listener);
-                StringBuilder sb = new StringBuilder("Candidates: ");
-                for (String s : collection.getCandidates()) {
-                    sb.append(s);
-                    sb.append(" ");
+            while ((line = reader.readLine()) != null) {
+                String [] command = line.split(":", 2);
+                if (command[0].equals("start")) {
+                    startCompletion(command[1]);
+                } else if (command[0].equals("stop")) {
+                    stopCompletion();
+                } else if (command[0].equals("exit")) {
+                    break;
                 }
-                logger.info(sb.toString());
-                collection.select();
             }
         }
+        RecognizerLibrary.INSTANCE.stop();
+    }
+
+    private static void startCompletion(String line) throws IOException {
+        CandidatesCollection collection = new Find(Paths.get(line)).findCandidates(listener, 3);
+        StringBuilder sb = new StringBuilder("Candidates: ");
+        for (String s : collection.getCandidates()) {
+            sb.append(s);
+            sb.append(" ");
+        }
+        logger.info(sb.toString());
+        collection.select();
+    }
+
+    private static void stopCompletion() {
+        RecognizerLibrary.INSTANCE.abort_recognition();
     }
 
     private static Properties log4jConfig(File logFile) {
@@ -67,15 +81,5 @@ public class App {
         properties.setProperty("log4j.appender.ROOT.layout", "org.apache.log4j.PatternLayout");
         properties.setProperty("log4j.appender.ROOT.layout.ConversionPattern", "%d [%t] %-5p %c - %m%n");
         return properties;
-    }
-
-    private static void registerSignalHandler() {
-        Signal usr1 = new Signal("USR1");
-        Signal.handle(usr1, new SignalHandler() {
-            @Override
-            public void handle(Signal signal) {
-                RecognizerLibrary.INSTANCE.abort_recognition();
-            }
-        });
     }
 }

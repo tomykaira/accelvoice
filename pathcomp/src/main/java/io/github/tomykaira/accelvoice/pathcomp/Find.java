@@ -19,23 +19,24 @@ public class Find {
         this.root = root;
     }
 
-    public CandidatesCollection findCandidates(SelectionListener listener) throws IOException {
+    public CandidatesCollection findCandidates(SelectionListener listener, int depth) throws IOException {
         List<String> candidates = new ArrayList<>();
-        findRecursively(root.toFile(), candidates);
+        findRecursively(root.toFile(), candidates, depth);
         return new CandidatesCollection(candidates, listener);
     }
 
-    private void findRecursively(final File parent, final List<String> paths) throws IOException {
+    private void findRecursively(final File parent, final List<String> paths, int depth) throws IOException {
         for (File file : parent.listFiles()) {
             if (isIgnored(file))
                 continue;
-            paths.add(file.toPath().relativize(root).toString());
-            if (file.isDirectory())
-                findRecursively(file, paths);
+            String relativePath = root.relativize(file.toPath()).toString();
+            paths.add(relativePath);
+            if (file.isDirectory() && depth > 0)
+                findRecursively(file, paths, depth-1);
         }
     }
 
     private boolean isIgnored(File file) {
-        return false;
+        return file.getName().equals(".git");
     }
 }
