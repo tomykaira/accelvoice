@@ -34,6 +34,12 @@
 
 ;;; Code:
 
+;; dependencies
+
+(require 'deferred)
+(require 'url)
+(require 'json)
+
 ;; variables
 
 (defvar accelvoice--projectdict-path "/usr/local/bin/projectdict")
@@ -44,21 +50,21 @@
 ;; current running process object, or nil
 (defvar accelvoice--current-process nil)
 
-;; list of start position, end position, word for which the accelvoice is recognizing
+;; plist of tag, candidate-count, start position, end position, word
+;; for which the accelvoice is recognizing
 (defvar accelvoice--current-completion nil)
 
 ;; functions
 
 (defun accelvoice--start-projectdict ()
-  "Start accelvoice backend process specifying dictionary file"
+  "Start accelvoice backend process specifying project root directory"
   (interactive)
   (when accelvoice--current-process
     (accelvoice--stop-projectdict))
-  (let ((dictionary (expand-file-name (read-file-name "Dictionary: ")))
+  (let ((project-root (expand-file-name (read-file-name "Project root: ")))
         (log (expand-file-name accelvoice--logfile)))
     (setq accelvoice--current-process
-          (start-process "projectdict" "projectdict" accelvoice--projectdict-path dictionary log))
-    (set-process-filter accelvoice--current-process 'accelvoice--process-filter)))
+          (start-process "projectdict" "projectdict" accelvoice--projectdict-path project-root log))))
 
 (defun accelvoice--complete ()
   "Run vocal completion with the symbol at point"
@@ -71,25 +77,52 @@
                   end (cdr bounds)
                   word (buffer-substring-no-properties start end))
           (setq start (point) end (point) word ""))
-        (setq accelvoice--current-completion (list start end word))
-        (process-send-string accelvoice--current-process (concat word "\n")))
+        (accelvoice--call-start-completion (list :start start :end end :word word)))
     (error "accelvoice process is not running.  Start with accelvoice--start-projectdict command.")))
 
-(defun accelvoice--process-filter (process output)
-  (if accelvoice--current-completion
-      (let ((start (nth 0 accelvoice--current-completion))
-            (end   (nth 1 accelvoice--current-completion))
-            (result (replace-regexp-in-string "
-" "" output)))
-        (setq accelvoice--current-completion nil)
-        (accelvoice--replace-region start end result))
-    (with-current-buffer (process-buffer process)
-      (let ((moving (= (point) (process-mark process))))
-        (save-excursion
-          (goto-char (process-mark process))
-          (insert output)
-          (set-marker (process-mark process) (point)))
-        (if moving (goto-char (process-mark process)))))))
+(defun accelvoice--call-start-completion (data)
+  "Call start-completion command"
+  (lexical-let*
+      ((current-completion data)
+       (word (plist-get data :word))
+       (params `((language . "ruby") (prefix . ,word))))
+    (deferred:$
+      (deferred:url-post "http://localhost:8302/start-completion" params)
+      (deferred:nextc it
+        (lambda (buf)
+          (let ((response (accelvoice--safe-json-read-from-buffer buf)))
+            (when response
+              (plist-put current-completion :tag (cdr (assoc 'tag response)))
+              (plist-put current-completion :candidate-count (cdr (assoc 'candidate_count response)))
+              (setq accelvoice--current-completion current-completion)
+              (force-mode-line-update)
+              (accelvoice--call-result current-completion)))
+          (kill-buffer buf))))))
+
+(defun accelvoice--call-result (current-completion)
+  (lexical-let* ((current-completion current-completion)
+                 (tag (plist-get current-completion :tag))
+                 (params (list (cons 'tag tag))))
+    (deferred:$
+      (deferred:url-post "http://localhost:8302/result" params)
+      (deferred:nextc it
+        (lambda (buf)
+          (let* ((response (accelvoice--safe-json-read-from-buffer buf))
+                 (selected (and response (cdr (assoc 'result response)))))
+            (when selected
+              (accelvoice--replace-region
+               (plist-get current-completion :start)
+               (plist-get current-completion :end)
+               selected)))
+          (when (string= tag (plist-get accelvoice--current-completion :tag))
+            (setq accelvoice--current-completion nil))
+          (kill-buffer buf))))))
+
+(defun accelvoice--safe-json-read-from-buffer (buffer)
+  (ignore-errors
+    (with-current-buffer buffer
+      (goto-char (point-min))
+      (json-read))))
 
 (defun accelvoice--replace-region (beg end rep)
   "Replace text in BUFFER in region (BEG END) with REP."
@@ -97,6 +130,12 @@
     (goto-char end)
     (insert rep)
     (delete-region beg end)))
+
+(defun accelvoice--update-mode-line ()
+  (let ((count (plist-get accelvoice--current-completion :candidate-count)))
+    (concat
+     "AVC:"
+     (if count (number-to-string count) "--"))))
 
 (defun accelvoice--stop-projectdict ()
   "Stop accelvoice backend process"
