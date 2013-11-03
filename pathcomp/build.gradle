@@ -1,0 +1,13 @@
+apply plugin: 'application'
+apply plugin: 'java'
+apply plugin: 'idea'
+
+dependencies {
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.codehaus.groovy:groovy-all:$ext.groovyVersion'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+
+    compile project(':selector')
+}
+
+mainClassName = 'io.github.tomykaira.accelvoice.pathcomp.App'
