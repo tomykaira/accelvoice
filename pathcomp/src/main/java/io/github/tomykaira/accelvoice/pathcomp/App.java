@@ -16,15 +16,6 @@ import java.util.Properties;
 public class App {
     private static final Logger logger = Logger.getLogger(App.class);
 
-    private static final SelectionListener listener = new SelectionListener() {
-        @Override
-        public void notify(String selected) {
-            logger.info("Result: " + selected);
-            System.out.println(selected);
-        }
-
-    };
-
     public static void main(String[] args) throws IOException {
         File logFile;
         if (args.length == 0) {
@@ -52,14 +43,31 @@ public class App {
         RecognizerLibrary.INSTANCE.stop();
     }
 
-    private static void startCompletion(String line) throws IOException {
-        CandidatesCollection collection = new Find(Paths.get(line)).findCandidates(listener, 3);
+    private static void startCompletion(final String line) {
+        SelectionListener listener = new SelectionListener() {
+            @Override
+            public void notify(String selected) {
+                logger.info("Result: " + selected);
+                File file = new File(line, selected);
+                System.out.println(file + (file.isFile() ? " [DONE]" : ""));
+                if (file.isDirectory())
+                    startCompletion(file.toString());
+            }
+        };
+        CandidatesCollection collection = null;
+        try {
+            collection = new Find(Paths.get(line)).findCandidates(listener, 0);
+        } catch (IOException e) {
+            logger.error("Failed to start complete from " + line, e);
+            return;
+        }
         StringBuilder sb = new StringBuilder("Candidates: ");
         for (String s : collection.getCandidates()) {
             sb.append(s);
             sb.append(" ");
         }
         logger.info(sb.toString());
+        System.out.println(sb.toString());
         collection.select();
     }
 
