@@ -48,6 +48,7 @@ Load client library and set projectdict path.
 (add-to-list 'load-path (concat accelvoice--root "/projectdict/clients"))
 (require 'accelvoice)
 (setq accelvoice--projectdict-path (concat accelvoice--root "/build/install/projectdict/bin/projectdict"))
+(global-set-key (kbd "C-,") 'accelvoice--complete)
 ```
 
 These configs make AccelVoice more useful on Emacs.
@@ -74,6 +75,27 @@ These configs make AccelVoice more useful on Emacs.
 
 (add-hook 'post-command-hook 'accelvoice--post-command-hook-function)
 ```
+
+## use
+
+Take [tomykaira/clockwork](https://github.com/tomykaira/clockwork/) as a sample project.
+`git clone git@github.com:tomykaira/clockwork.git` under `~`.
+
+- `M-x accelvoice--start-projectdict` opens the minibuffer.  Put path to the project clockwork`.
+- Put "clo" into any buffer, and press `C-,`, or `M-x accelvoice--complete`.
+- Then speak "clockwork" to the microphone.
+- "clo" will be expanded to "clockwork".
+
+If it gives unexpected result (for example "clock"), try several times and other words.
+It it seems not working, check the log file `~/.accelvoice/projectdict.log`.
+
+Here are key lines to find out the cause.
+
+- "TIME [main] INFO  io.github.tomykaira.accelvoice.projectdict.App - Starting projectdict server for /path/to/clockwork/": Emacs correctly starts AccelVoice projectdict server
+- "TIME [main] INFO  io.github.tomykaira.accelvoice.projectdict.Server - System initialized in ***: Server started successfully.
+- "TIME [pool-1-thread-2] INFO  io.github.tomykaira.accelvoice.projectdict.HttpCompletionHandler - -1938647573: complete clo from clockwork clock clone": completion is correctly started
+- "INFO: callbacks.c(31): vader start ********: vocal input is recognized.  If there is no line like this, ensure the mic is working.
+- "ERROR: "fsg_search.c", line 1104: Final result does not match the grammar in frame ***": AccelVoice is working, but matching candidate is not found. Try again with better pronunciation ;)
 
 # Contribution
 
