@@ -14,6 +14,7 @@ Any report about working / not working is welcome.
 
 This tool uses gstreamer, sphinxbase, pocketsphinx, and flite for speech recognition.
 
+- jna: From apt `apt-get install libjna-java`
 - gsteramer: From apt `apt-get install libgstreamer0.10-dev`
 - sphinxbase
     - Fetch from [CMU Sphinx - Browse /sphinxbase/0.8 at SourceForge.net](http://sourceforge.net/projects/cmusphinx/files/sphinxbase/0.8/)
@@ -21,6 +22,14 @@ This tool uses gstreamer, sphinxbase, pocketsphinx, and flite for speech recogni
 - pocketsphinx
     - [CMU Sphinx - Browse /pocketsphinx/0.8 at SourceForge.net](http://sourceforge.net/projects/cmusphinx/files/pocketsphinx/0.8/)
     - configure, make, make install
+    - install gst plugins
+
+```shell
+cd src/gst-plugin
+make
+sudo cp .libs/libgstpocketsphinx.so /usr/lib/gstreamer-0.10
+```
+
 - flite
     - Fetch from [Index of /flite/packed/flite-1.4](http://www.festvox.org/flite/packed/flite-1.4/)
     - configure, make, make install
