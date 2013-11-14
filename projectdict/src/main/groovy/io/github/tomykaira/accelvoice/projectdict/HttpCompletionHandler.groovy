@@ -61,9 +61,13 @@ class HttpCompletionHandler implements HttpHandler {
         def listener = listenerForTag(tag)
         def collection = collector.completeByPrefix(prefix, listener)
 
-        logger.info("$tag: complete $prefix from ${collection.candidates.join(" ")}")
+        if (collection.candidates.isEmpty()) {
+            logger.info("$tag: No candidate found for $prefix")
+        } else {
+            logger.info("$tag: complete $prefix from ${collection.candidates.collect { "\"$it\"" }.join(" ")}")
+            collection.select()
+        }
 
-        collection.select()
         activeTag = tag
 
         [

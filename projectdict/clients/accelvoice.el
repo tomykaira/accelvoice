@@ -92,11 +92,13 @@
         (lambda (buf)
           (let ((response (accelvoice--safe-json-read-from-buffer buf)))
             (when response
-              (plist-put current-completion :tag (cdr (assoc 'tag response)))
-              (plist-put current-completion :candidate-count (cdr (assoc 'candidate_count response)))
-              (setq accelvoice--current-completion current-completion)
-              (force-mode-line-update)
-              (accelvoice--call-result current-completion)))
+              (let ((count (cdr (assoc 'candidate_count response))))
+                (plist-put current-completion :tag (cdr (assoc 'tag response)))
+                (plist-put current-completion :candidate-count count)
+                (setq accelvoice--current-completion current-completion)
+                (force-mode-line-update)
+                (unless (= count 0)
+                    (accelvoice--call-result current-completion)))))
           (kill-buffer buf))))))
 
 (defun accelvoice--call-result (current-completion)

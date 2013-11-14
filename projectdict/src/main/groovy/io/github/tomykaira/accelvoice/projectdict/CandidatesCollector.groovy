@@ -12,6 +12,6 @@ class CandidatesCollector {
 
     CandidatesCollection completeByPrefix(String prefix, SelectionListener listener) {
         Trie found = trie.find(prefix)
-        new CandidatesCollection(found.toWordList(), listener)
+        new CandidatesCollection(found.toWordList().findAll { !it.isEmpty() }, listener)
     }
 }
