@@ -79,7 +79,7 @@ These configs make AccelVoice more useful on Emacs.
 (defun accelvoice--post-command-hook-function ()
   (when (and accelvoice--current-process (eq this-command 'self-insert-command))
     (let ((bounds (bounds-of-thing-at-point 'symbol)))
-      (when (< 1 (- (cdr bounds) (car bounds)))
+      (when (and bounds (< 1 (- (cdr bounds) (car bounds))))
         (accelvoice--complete)))))
 
 (add-hook 'post-command-hook 'accelvoice--post-command-hook-function)
