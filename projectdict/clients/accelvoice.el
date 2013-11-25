@@ -128,10 +128,14 @@
 
 (defun accelvoice--replace-region (beg end rep)
   "Replace text in BUFFER in region (BEG END) with REP."
-  (save-excursion
-    (goto-char end)
-    (insert rep)
-    (delete-region beg end)))
+  (let ((proc (lambda ()
+                (goto-char end)
+                (insert rep)
+                (delete-region beg end))))
+    (if (= end (point))
+        (funcall proc)
+      (save-excursion
+        (funcall proc)))))
 
 (defun accelvoice--update-mode-line ()
   (let ((count (plist-get accelvoice--current-completion :candidate-count)))
