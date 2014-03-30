@@ -111,3 +111,26 @@ Here are key lines to find out the cause.
 If you find a problem or have a question, please report it from Issues.
 
 If you fix a bug or implement enhancement, please send me a pull-request.
+
+# License
+
+GNU General Public License version 3.
+
+Copyright 2013 tomykaira
+
+    This file is part of AccelVoice.
+
+    AccelVoice is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    AccelVoice is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with AccelVoice.  If not, see <http://www.gnu.org/licenses/>.
+
+See COPYING for more details.
